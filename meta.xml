@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 1999-2018. Plesk International GmbH. All rights reserved. -->
+<module>
+  <id>diskspace-usage-viewer</id>
+  <name>Diskspace Usage</name>
+  <description>Find folders with most used diskspace and easily free up some space.</description>
+  <version>1.0</version>
+  <release>1</release>
+  <vendor>Plesk</vendor>
+  <url>https://www.plesk.com</url>
+  <plesk_min_version>17.0</plesk_min_version>
+</module>
