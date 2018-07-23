@@ -1,5 +1,6 @@
 <?php
 // Copyright 1999-2018. Plesk International GmbH. All rights reserved.
-?>
-<?php echo '<p>' . pm_Locale::lmsg('pageDescription') . '</p>'; ?>
-<?= $this->renderList($this->list); ?>
+
+echo '<p>' . pm_Locale::lmsg('pageDescription') . '</p>';
+
+echo $this->renderList($this->list);

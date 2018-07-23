@@ -3,14 +3,16 @@
 
 class IndexController extends pm_Controller_Action
 {
-    private $currentPath ='/';
+    private $currentPath = '/';
+
     protected $_accessLevel = 'admin';
 
     public function init()
     {
         parent::init();
 
-        $this->view->headLink()->appendStylesheet(pm_Context::getBaseUrl().'styles.css');
+        $this->view->headLink()->appendStylesheet(pm_Context::getBaseUrl() . 'styles.css');
+
         $this->setPath('/');
     }
 
@@ -30,13 +32,14 @@ class IndexController extends pm_Controller_Action
         }
 
         $list = $this->getFolderList($this->currentPath);
+
         $this->_helper->json($list->fetchData());
     }
 
     private function setPath($path)
     {
         if (empty($path)) {
-            throw new Exception("Path must not be null");
+            throw new Exception('Path must not be null');
         }
 
         // add security handling to ensure only paths can be viewed with current priviledges
@@ -48,12 +51,12 @@ class IndexController extends pm_Controller_Action
             $domains = pm_Domain::getDomainsByClient(pm_Session::getClient(), true);
 
             if (sizeof($domains) > 0) {
-                var_dump('getVhostSystemPath='.$domains[0]->getVhostSystemPath());
-                var_dump('getDocumentRoot='.$domains[0]->getDocumentRoot());
-                var_dump('getHomePath='.$domains[0]->getHomePath());
+                var_dump('getVhostSystemPath=' . $domains[0]->getVhostSystemPath());
+                var_dump('getDocumentRoot=' . $domains[0]->getDocumentRoot());
+                var_dump('getHomePath=' . $domains[0]->getHomePath());
                 $this->currentPath = $domains[0]->getVhostSystemPath();
             } else {
-                throw new Exception("No webspace found for this user!");
+                throw new Exception('No webspace found for this user!');
             }
         }
 
@@ -71,9 +74,10 @@ class IndexController extends pm_Controller_Action
 
     private function getCurrentPathBreadcrump()
     {
-        $breadCrumb = '/';
-        $path = '/';
         $folders = explode('/', $this->currentPath);
+        $path = '/';
+        $breadCrumb = '/';
+
         foreach ($folders as $folder) {
             if (!empty($folder)) {
                 $path .= $folder . '/';
@@ -98,6 +102,7 @@ class IndexController extends pm_Controller_Action
 
         $diskspaceUsageViewer = new Modules_DiskspaceUsageViewer_DiskspaceUsageViewer();
         $folders = $diskspaceUsageViewer->getDiskspaceUsage($path);
+
         foreach ($folders as $folder) {
             $data[] = [
                 'size' => '<span class="hidden">' . str_pad($folder[0], 10, '0', STR_PAD_LEFT) . '</span>' . Modules_DiskspaceUsageViewer_DiskspaceUsageViewer::formatSize($folder[0]),
@@ -111,6 +116,7 @@ class IndexController extends pm_Controller_Action
         );
 
         $list = new pm_View_List_Simple($this->view, $this->_request, $options);
+
         $list->setColumns([
             'size' => [
                 'title' => pm_Locale::lmsg('columnSize'),
@@ -124,6 +130,7 @@ class IndexController extends pm_Controller_Action
                 'searchable' => true,
             ],
         ]);
+
         $list->setData($data);
         $list->setDataUrl(['action' => 'index-data']);
 
