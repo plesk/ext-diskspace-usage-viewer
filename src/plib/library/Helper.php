@@ -1,7 +1,9 @@
 <?php
 // Copyright 1999-2018. Plesk International GmbH. All rights reserved.
 
-class Modules_DiskspaceUsageViewer_DiskspaceUsageViewer
+namespace PleskExt\DiskspaceUsageViewer;
+
+class Helper
 {
     public static function formatSize($kb)
     {
@@ -21,10 +23,10 @@ class Modules_DiskspaceUsageViewer_DiskspaceUsageViewer
         }
     }
 
-    public function getDiskspaceUsage($path)
+    public static function getDiskspaceUsage($path)
     {
         $list = [];
-        $result = pm_ApiCli::callSbin('diskspace_usage.sh', [$path]);
+        $result = \pm_ApiCli::callSbin('diskspace_usage.sh', [$path]);
 
         foreach(preg_split("/((\r?\n)|(\r\n?))/", $result['stdout']) as $line) {
             $matches = [];
