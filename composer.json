@@ -15,9 +15,6 @@
       ]
     }
   },
-  "require": {
-    "plesk/api-php-lib": "@dev"
-  },
   "require-dev": {
     "plesk/pm-api-stubs": "^17.0"
   }
