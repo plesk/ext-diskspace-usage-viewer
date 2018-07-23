@@ -1,0 +1,24 @@
+{
+  "name": "plesk/ext-diskspace-usage-viewer",
+  "config": {
+    "vendor-dir": "src/plib/vendor"
+  },
+  "autoload": {
+    "psr-4": {
+      "PleskExt\\DiskspaceUsageViewer\\": "modules/diskspace-usage-viewer/library/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "PleskExt\\DiskspaceUsageViewer\\": [
+        "src/plib/library/"
+      ]
+    }
+  },
+  "require": {
+    "plesk/api-php-lib": "@dev"
+  },
+  "require-dev": {
+    "plesk/pm-api-stubs": "^17.0"
+  }
+}
