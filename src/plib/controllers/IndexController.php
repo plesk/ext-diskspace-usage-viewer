@@ -111,10 +111,10 @@ class IndexController extends \pm_Controller_Action
             ];
         }
 
-        $options = array (
+        $options = [
             'defaultSortField' => 'size',
             'defaultSortDirection' => \pm_View_List_Simple::SORT_DIR_DOWN,
-        );
+        ];
 
         $list = new \pm_View_List_Simple($this->view, $this->_request, $options);
 
@@ -133,7 +133,7 @@ class IndexController extends \pm_Controller_Action
         ]);
 
         $list->setData($data);
-        $list->setDataUrl(['action' => 'index-data']);
+        $list->setDataUrl(['action' => 'index-data?path=' . $path]);
 
         return $list;
     }
