@@ -133,7 +133,7 @@ class IndexController extends \pm_Controller_Action
         ]);
 
         $list->setData($data);
-        $list->setDataUrl(['action' => 'index-data?path=' . $path]);
+        $list->setDataUrl($this->_helper->url('index-data', 'index', null, ['path' => $path]));
 
         return $list;
     }
