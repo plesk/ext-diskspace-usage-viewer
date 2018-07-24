@@ -3,4 +3,33 @@
 
 echo '<p>' . \pm_Locale::lmsg('pageDescription') . '</p>';
 
+echo '<div id="piechart" style="width: 800px; height: 400px;"></div>';
+
 echo $this->renderList($this->list);
+
+?>
+
+<script>
+google.charts.load('current', {'packages':['corechart']});
+google.charts.setOnLoadCallback(drawDiskspaceUsageChart);
+
+function drawDiskspaceUsageChart()
+{
+    var data = new google.visualization.DataTable();
+
+    data.addColumn('string', 'Name');
+    data.addColumn('number', 'Size');
+    data.addColumn({type: 'string', role: 'tooltip'});
+
+    data.addRows(<?= json_encode($this->chartData); ?>);
+
+    var options = {
+        title: '',
+        is3D: true
+    };
+
+    var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+
+    chart.draw(data, options);
+}
+</script>
