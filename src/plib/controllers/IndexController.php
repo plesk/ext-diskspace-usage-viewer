@@ -62,7 +62,7 @@ class IndexController extends \pm_Controller_Action
             }
         }
 
-        $this->view->pageTitle = $this->lmsg('pageTitle', ['path' => $this->getCurrentPathBreadcrump()]);
+        $this->view->pageTitle = $this->lmsg('pageTitle', ['path' => $this->getCurrentPathBreadcrumb()]);
     }
 
     private function getFullPath($folderName)
@@ -74,7 +74,7 @@ class IndexController extends \pm_Controller_Action
         }
     }
 
-    private function getCurrentPathBreadcrump()
+    private function getCurrentPathBreadcrumb()
     {
         $folders = explode('/', $this->currentPath);
         $path = '/';
