@@ -37,7 +37,10 @@ class Helper
             $folderName = trim($matches[2]);
 
             if (!empty($folderName) && ($folderName != '.')) {
-                $list[] = [$folderSize, $folderName];
+                $list[] = [
+                    'size' => $folderSize,
+                    'name' => $folderName,
+                ];
             }
         }
 

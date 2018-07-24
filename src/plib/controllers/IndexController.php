@@ -13,7 +13,9 @@ class IndexController extends \pm_Controller_Action
     {
         parent::init();
 
-        $this->view->headLink()->appendStylesheet(\pm_Context::getBaseUrl() . 'styles.css');
+        $this->view->headLink()->appendStylesheet(\pm_Context::getBaseUrl() . 'css/styles.css');
+
+        $this->view->headScript()->appendFile('https://www.gstatic.com/charts/loader.js');
 
         $this->setPath('/');
     }
@@ -24,7 +26,16 @@ class IndexController extends \pm_Controller_Action
             $this->setPath($this->_getParam('path'));
         }
 
-        $this->view->list = $this->getFolderList($this->currentPath);
+        $folders = Helper::getDiskspaceUsage($this->currentPath);
+        $this->view->list = $this->getFolderList($this->currentPath, $folders);
+
+        $chartData = [];
+
+        foreach (array_slice($folders, 0, 10) as $folder) {
+            $chartData[] = [$folder['name'], $folder['size'], $folder['name'] . ' ' . Helper::formatSize($folder['size'])];
+        }
+
+        $this->view->chartData = $chartData;
     }
 
     public function indexDataAction()
@@ -33,7 +44,8 @@ class IndexController extends \pm_Controller_Action
             $this->setPath($this->_getParam('path'));
         }
 
-        $list = $this->getFolderList($this->currentPath);
+        $folders = Helper::getDiskspaceUsage($this->currentPath);
+        $list = $this->getFolderList($this->currentPath, $folders);
 
         $this->_helper->json($list->fetchData());
     }
@@ -90,7 +102,7 @@ class IndexController extends \pm_Controller_Action
         return $breadCrumb;
     }
 
-    private function getFolderList($path)
+    private function getFolderList($path, array $folders)
     {
         $data = [];
 
@@ -98,16 +110,14 @@ class IndexController extends \pm_Controller_Action
         if ($path != '/') {
             $data[] = [
                 'size' => '<span class="hidden">9999999999</span>',
-                'folder' => '<a href="' . \pm_Context::getBaseUrl() . '?path=' . Helper::getParentPath($this->currentPath) .'">..</a>',
+                'folder' => '<a href="' . \pm_Context::getBaseUrl() . '?path=' . Helper::getParentPath($path) .'">..</a>',
             ];
         }
 
-        $folders = Helper::getDiskspaceUsage($path);
-
         foreach ($folders as $folder) {
             $data[] = [
-                'size' => '<span class="hidden">' . str_pad($folder[0], 10, '0', STR_PAD_LEFT) . '</span>' . Helper::formatSize($folder[0]),
-                'folder' => '<a href="' . \pm_Context::getBaseUrl() . '?path=' . $this->getFullPath($folder[1]) .'">' . $folder[1] . '</a>',
+                'size' => '<span class="hidden">' . str_pad($folder['size'], 10, '0', STR_PAD_LEFT) . '</span>' . Helper::formatSize($folder['size']),
+                'folder' => '<a href="' . \pm_Context::getBaseUrl() . '?path=' . $this->getFullPath($folder['name']) .'">' . $folder['name'] . '</a>',
             ];
         }
 
