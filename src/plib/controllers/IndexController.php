@@ -50,27 +50,13 @@ class IndexController extends \pm_Controller_Action
 
     private function setCurrentPath($path)
     {
-        if (empty($path)) {
-            throw new \Exception('Path must not be null');
+        $path = trim($path);
+
+        if ($path == '') {
+            $path = '/';
         }
 
-        // add security handling to ensure only paths can be viewed with current priviledges
-        // add security handling to prevent manipulating path string
-        if (\pm_Session::getClient()->isAdmin()) {
-            $this->currentPath = $path;
-        } else {
-            // TODO: get path of webspace of current user and make sure this is always the base directory
-            $domains = \pm_Domain::getDomainsByClient(\pm_Session::getClient(), true);
-
-            if (sizeof($domains) > 0) {
-                var_dump('getVhostSystemPath=' . $domains[0]->getVhostSystemPath());
-                var_dump('getDocumentRoot=' . $domains[0]->getDocumentRoot());
-                var_dump('getHomePath=' . $domains[0]->getHomePath());
-                $this->currentPath = $domains[0]->getVhostSystemPath();
-            } else {
-                throw new \Exception('No webspace found for this user!');
-            }
-        }
+        $this->currentPath = $path;
     }
 
     private function getFullPath($folderName)
