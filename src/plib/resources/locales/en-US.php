@@ -5,5 +5,5 @@ $messages = [
     'pageTitle' => 'Diskspace usage of %%path%%',
     'pageDescription' => 'Find folders with most used diskspace and easily free up some space.',
     'columnSize' => 'Size',
-    'columnFolder' => 'Folder',
+    'columnPath' => 'Path',
 ];
