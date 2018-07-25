@@ -21,7 +21,7 @@ class IndexController extends \pm_Controller_Action
     public function indexAction()
     {
         if ($this->_getParam('path')) {
-            $this->setCurrentPath($this->_getParam('path'));
+            $this->setCurrentPath(Helper::cleanPath($this->_getParam('path')));
         }
 
         $usage = Helper::getDiskspaceUsage($this->currentPath);
@@ -39,7 +39,7 @@ class IndexController extends \pm_Controller_Action
     public function indexDataAction()
     {
         if ($this->_getParam('path')) {
-            $this->setCurrentPath($this->_getParam('path'));
+            $this->setCurrentPath(Helper::cleanPath($this->_getParam('path')));
         }
 
         $usage = Helper::getDiskspaceUsage($this->currentPath);

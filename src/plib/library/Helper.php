@@ -16,6 +16,14 @@ class Helper
         }
     }
 
+    public static function cleanPath($path)
+    {
+        $path = str_replace('\\', '/', $path);
+        $path = str_replace('../', '', $path);
+
+        return $path;
+    }
+
     public static function getParentPath($path)
     {
         if ($path != '/') {
