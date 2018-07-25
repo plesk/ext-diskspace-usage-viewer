@@ -16,41 +16,39 @@ class IndexController extends \pm_Controller_Action
         $this->view->headLink()->appendStylesheet(\pm_Context::getBaseUrl() . 'css/styles.css');
 
         $this->view->headScript()->appendFile('https://www.gstatic.com/charts/loader.js');
-
-        $this->setPath('/');
     }
 
     public function indexAction()
     {
         if ($this->_getParam('path')) {
-            $this->setPath($this->_getParam('path'));
+            $this->setCurrentPath($this->_getParam('path'));
         }
 
-        $folders = Helper::getDiskspaceUsage($this->currentPath);
-        $this->view->list = $this->getFolderList($this->currentPath, $folders);
-
+        $usage = Helper::getDiskspaceUsage($this->currentPath);
         $chartData = [];
 
-        foreach (array_slice($folders, 0, 10) as $folder) {
-            $chartData[] = [$folder['name'], $folder['size'], $folder['name'] . ' ' . Helper::formatSize($folder['size'])];
+        foreach (array_slice($usage, 0, 10) as $item) {
+            $chartData[] = [$item['displayName'], $item['size'], $item['name'] . ' ' . Helper::formatSize($item['size'])];
         }
 
+        $this->view->pageTitle = $this->lmsg('pageTitle', ['path' => $this->getCurrentPathBreadcrumb()]);
         $this->view->chartData = $chartData;
+        $this->view->list = $this->getUsageList($this->currentPath, $usage);
     }
 
     public function indexDataAction()
     {
         if ($this->_getParam('path')) {
-            $this->setPath($this->_getParam('path'));
+            $this->setCurrentPath($this->_getParam('path'));
         }
 
-        $folders = Helper::getDiskspaceUsage($this->currentPath);
-        $list = $this->getFolderList($this->currentPath, $folders);
+        $usage = Helper::getDiskspaceUsage($this->currentPath);
+        $list = $this->getUsageList($this->currentPath, $usage);
 
         $this->_helper->json($list->fetchData());
     }
 
-    private function setPath($path)
+    private function setCurrentPath($path)
     {
         if (empty($path)) {
             throw new \Exception('Path must not be null');
@@ -73,8 +71,6 @@ class IndexController extends \pm_Controller_Action
                 throw new \Exception('No webspace found for this user!');
             }
         }
-
-        $this->view->pageTitle = $this->lmsg('pageTitle', ['path' => $this->getCurrentPathBreadcrumb()]);
     }
 
     private function getFullPath($folderName)
@@ -88,36 +84,42 @@ class IndexController extends \pm_Controller_Action
 
     private function getCurrentPathBreadcrumb()
     {
-        $folders = explode('/', $this->currentPath);
+        $segments = explode('/', $this->currentPath);
         $path = '/';
         $breadCrumb = '/';
 
-        foreach ($folders as $folder) {
-            if (!empty($folder)) {
-                $path .= $folder . '/';
-                $breadCrumb .= '<a href="' . \pm_Context::getBaseUrl() . '?path=' . $path .'">' . $folder . '</a>/';
+        foreach ($segments as $segment) {
+            if (!empty($segment)) {
+                $path .= $segment . '/';
+                $breadCrumb .= '<a href="' . \pm_Context::getBaseUrl() . '?path=' . $path .'">' . $segment . '</a>/';
             }
         }
 
         return $breadCrumb;
     }
 
-    private function getFolderList($path, array $folders)
+    private function getUsageList($currentPath, array $usage)
     {
         $data = [];
 
         // add first row to navigate to parent folder
-        if ($path != '/') {
+        if ($currentPath != '/') {
             $data[] = [
                 'size' => '<span class="hidden">9999999999</span>',
-                'folder' => '<a href="' . \pm_Context::getBaseUrl() . '?path=' . Helper::getParentPath($path) .'">..</a>',
+                'path' => '<a href="' . \pm_Context::getBaseUrl() . '?path=' . Helper::getParentPath($currentPath) . '">..</a>',
             ];
         }
 
-        foreach ($folders as $folder) {
+        foreach ($usage as $item) {
+            $displayPath = $item['displayName'];
+
+            if ($item['isDir']) {
+                $displayPath = '<a href="' . \pm_Context::getBaseUrl() . '?path=' . $this->getFullPath($item['name']) . '">' . $item['displayName'] . '</a>';
+            }
+
             $data[] = [
-                'size' => '<span class="hidden">' . str_pad($folder['size'], 10, '0', STR_PAD_LEFT) . '</span>' . Helper::formatSize($folder['size']),
-                'folder' => '<a href="' . \pm_Context::getBaseUrl() . '?path=' . $this->getFullPath($folder['name']) .'">' . $folder['name'] . '</a>',
+                'size' => '<span class="hidden">' . str_pad($item['size'], 10, '0', STR_PAD_LEFT) . '</span>' . Helper::formatSize($item['size']),
+                'path' => $displayPath,
             ];
         }
 
@@ -134,8 +136,8 @@ class IndexController extends \pm_Controller_Action
                 'noEscape' => true,
                 'sortable' => true,
             ],
-            'folder' => [
-                'title' => \pm_Locale::lmsg('columnFolder'),
+            'path' => [
+                'title' => \pm_Locale::lmsg('columnPath'),
                 'noEscape' => true,
                 'sortable' => true,
                 'searchable' => true,
@@ -143,7 +145,7 @@ class IndexController extends \pm_Controller_Action
         ]);
 
         $list->setData($data);
-        $list->setDataUrl($this->_helper->url('index-data', 'index', null, ['path' => $path]));
+        $list->setDataUrl($this->_helper->url('index-data', 'index', null, ['path' => $currentPath]));
 
         return $list;
     }

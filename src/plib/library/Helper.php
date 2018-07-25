@@ -27,21 +27,26 @@ class Helper
     {
         $list = [];
         $result = \pm_ApiCli::callSbin('diskspace_usage.sh', [$path]);
+        $lines = explode("\n", $result['stdout']);
 
-        foreach(preg_split("/((\r?\n)|(\r\n?))/", $result['stdout']) as $line) {
-            $matches = [];
+        foreach ($lines as $line) {
+            $arr = explode(' ', $line);
+            $size = (int)array_shift($arr);
+            $name = trim(array_shift($arr));
 
-            preg_match('/([0-9]+)([^0-9]+)/', $line, $matches);
-
-            $folderSize = intval($matches[1]);
-            $folderName = trim($matches[2]);
-
-            if (!empty($folderName) && ($folderName != '.')) {
-                $list[] = [
-                    'size' => $folderSize,
-                    'name' => $folderName,
-                ];
+            if ($name == '.') {
+                continue;
             }
+
+            $type = trim(implode(' ', $arr));
+            $isDir = ($type == 'directory') ? true : false;
+
+            $list[] = [
+                'size' => $size,
+                'name' => $name,
+                'isDir' => $isDir,
+                'displayName' => $isDir ? '/' . $name : $name,
+            ];
         }
 
         return $list;
