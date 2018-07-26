@@ -8,11 +8,11 @@ class Helper
     public static function formatSize($kb)
     {
         if ($kb > 1048576) {
-            return round($kb / 1048576, 1) . ' GB';
+            return round($kb / 1048576, 1) . '&nbsp;GB';
         } else if ($kb > 1024) {
-            return round($kb / 1024, 1) . ' MB';
+            return round($kb / 1024, 1) . '&nbsp;MB';
         } else {
-            return round($kb, 1) . ' KB';
+            return round($kb, 1) . '&nbsp;KB';
         }
     }
 
