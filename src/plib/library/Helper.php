@@ -24,13 +24,6 @@ class Helper
         return $path;
     }
 
-    public static function getParentPath($path)
-    {
-        if ($path != '/') {
-            return pathinfo($path, PATHINFO_DIRNAME);
-        }
-    }
-
     public static function getDiskspaceUsage($path)
     {
         $list = [];
@@ -53,7 +46,7 @@ class Helper
                 'size' => $size,
                 'name' => $name,
                 'isDir' => $isDir,
-                'displayName' => $isDir ? '/' . $name : $name,
+                'displayName' => $isDir ? $name . '/' : $name,
             ];
         }
 

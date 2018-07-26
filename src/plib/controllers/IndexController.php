@@ -70,31 +70,27 @@ class IndexController extends \pm_Controller_Action
 
     private function getCurrentPathBreadcrumb()
     {
-        $segments = explode('/', $this->currentPath);
-        $path = '/';
-        $breadCrumb = '/';
+        $path = trim($this->currentPath, '/');
 
-        foreach ($segments as $segment) {
-            if (!empty($segment)) {
-                $path .= $segment . '/';
-                $breadCrumb .= '<a href="' . $this->_helper->url('index', 'index', null, ['path' => $path]) .'">' . htmlspecialchars($segment) . '</a>/';
-            }
+        if ($path == '') {
+            return '<a href="' . $this->_helper->url('index', 'index', null, ['path' => $currentPath]) . '">/</a>';
         }
 
-        return $breadCrumb;
+        $names = explode('/', $path);
+        $currentPath = '/';
+        $breadcrumbs = ['<a href="' . $this->_helper->url('index', 'index', null, ['path' => $currentPath]) . '">/</a>'];
+
+        foreach ($names as $name) {
+            $currentPath .= $name . '/';
+            $breadcrumbs[] = '<a href="' . $this->_helper->url('index', 'index', null, ['path' => $currentPath]) . '">' . htmlspecialchars($name) . '/</a>';
+        }
+
+        return implode(' ', $breadcrumbs);
     }
 
     private function getUsageList($currentPath, array $usage)
     {
         $data = [];
-
-        // add first row to navigate to parent folder
-        if ($currentPath != '/') {
-            $data[] = [
-                'size' => '<span class="hidden">9999999999</span>',
-                'path' => '<a href="' . $this->_helper->url('index', 'index', null, ['path' => Helper::getParentPath($currentPath)]) . '">..</a>',
-            ];
-        }
 
         foreach ($usage as $item) {
             $displayPath = $item['displayName'];
