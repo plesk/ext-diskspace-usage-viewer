@@ -77,7 +77,7 @@ class IndexController extends \pm_Controller_Action
         foreach ($segments as $segment) {
             if (!empty($segment)) {
                 $path .= $segment . '/';
-                $breadCrumb .= '<a href="' . $this->_helper->url('index', 'index', null, ['path' => $path]) .'">' . $segment . '</a>/';
+                $breadCrumb .= '<a href="' . $this->_helper->url('index', 'index', null, ['path' => $path]) .'">' . htmlspecialchars($segment) . '</a>/';
             }
         }
 
@@ -100,11 +100,11 @@ class IndexController extends \pm_Controller_Action
             $displayPath = $item['displayName'];
 
             if ($item['isDir']) {
-                $displayPath = '<a href="' . $this->_helper->url('index', 'index', null, ['path' => $this->getFullPath($item['name'])]) . '">' . $item['displayName'] . '</a>';
+                $displayPath = '<a href="' . $this->_helper->url('index', 'index', null, ['path' => $this->getFullPath($item['name'])]) . '">' . htmlspecialchars($item['displayName']) . '</a>';
             }
 
             $data[] = [
-                'size' => '<span class="hidden">' . str_pad($item['size'], 10, '0', STR_PAD_LEFT) . '</span>' . Helper::formatSize($item['size']),
+                'size' => '<span class="hidden">' . str_pad($item['size'], 10, '0', STR_PAD_LEFT) . '</span>' . htmlspecialchars(Helper::formatSize($item['size'])),
                 'path' => $displayPath,
             ];
         }
