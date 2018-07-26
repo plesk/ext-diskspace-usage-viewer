@@ -24,13 +24,6 @@ class Helper
         return $path;
     }
 
-    public static function getParentPath($path)
-    {
-        if ($path != '/') {
-            return pathinfo($path, PATHINFO_DIRNAME);
-        }
-    }
-
     public static function getDiskspaceUsage($path)
     {
         $list = [];
