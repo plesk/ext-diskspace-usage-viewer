@@ -77,7 +77,7 @@ class IndexController extends \pm_Controller_Action
         foreach ($segments as $segment) {
             if (!empty($segment)) {
                 $path .= $segment . '/';
-                $breadCrumb .= '<a href="' . \pm_Context::getBaseUrl() . '?path=' . $path .'">' . $segment . '</a>/';
+                $breadCrumb .= '<a href="' . $this->_helper->url('index', 'index', null, ['path' => $path]) .'">' . $segment . '</a>/';
             }
         }
 
@@ -92,7 +92,7 @@ class IndexController extends \pm_Controller_Action
         if ($currentPath != '/') {
             $data[] = [
                 'size' => '<span class="hidden">9999999999</span>',
-                'path' => '<a href="' . \pm_Context::getBaseUrl() . '?path=' . Helper::getParentPath($currentPath) . '">..</a>',
+                'path' => '<a href="' . $this->_helper->url('index', 'index', null, ['path' => Helper::getParentPath($currentPath)]) . '">..</a>',
             ];
         }
 
@@ -100,7 +100,7 @@ class IndexController extends \pm_Controller_Action
             $displayPath = $item['displayName'];
 
             if ($item['isDir']) {
-                $displayPath = '<a href="' . \pm_Context::getBaseUrl() . '?path=' . $this->getFullPath($item['name']) . '">' . $item['displayName'] . '</a>';
+                $displayPath = '<a href="' . $this->_helper->url('index', 'index', null, ['path' => $this->getFullPath($item['name'])]) . '">' . $item['displayName'] . '</a>';
             }
 
             $data[] = [
