@@ -46,7 +46,7 @@ class Helper
                 'size' => $size,
                 'name' => $name,
                 'isDir' => $isDir,
-                'displayName' => $isDir ? '/' . $name : $name,
+                'displayName' => $isDir ? $name . '/' : $name,
             ];
         }
 
