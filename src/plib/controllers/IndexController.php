@@ -28,7 +28,7 @@ class IndexController extends pm_Controller_Action
         $chartData = [];
 
         foreach (array_slice($usage, 0, 10) as $item) {
-            $chartData[] = [$item['displayName'], $item['size'], $item['name'] . ' ' . Helper::formatSize($item['size'])];
+            $chartData[] = [$item['displayName'], $item['size'], $item['displayName']];
         }
 
         $this->view->pageTitle = $this->lmsg('pageTitle', ['path' => $this->getCurrentPathBreadcrumb()]);
@@ -102,8 +102,8 @@ class IndexController extends pm_Controller_Action
 
             $data[] = [
                 'id' => $fullPath,
-                'size' => '<span class="hidden">' . str_pad($item['size'], 10, '0', STR_PAD_LEFT) . '</span>' . Helper::formatSize($item['size']),
                 'path' => $displayPath,
+                'size' => '<span class="hidden">' . str_pad($item['size'], 10, '0', STR_PAD_LEFT) . '</span>' . Helper::formatSize($item['size']),
             ];
         }
 
@@ -116,16 +116,17 @@ class IndexController extends pm_Controller_Action
 
         $list->setColumns([
             pm_View_List_Simple::COLUMN_SELECTION,
-            'size' => [
-                'title' => pm_Locale::lmsg('columnSize'),
-                'noEscape' => true,
-                'sortable' => true,
-            ],
             'path' => [
                 'title' => pm_Locale::lmsg('columnPath'),
                 'noEscape' => true,
                 'sortable' => true,
                 'searchable' => true,
+            ],
+            'size' => [
+                'title' => pm_Locale::lmsg('columnSize'),
+                'noEscape' => true,
+                'sortable' => true,
+                'cls' => 'number t-r',
             ],
         ]);
 
