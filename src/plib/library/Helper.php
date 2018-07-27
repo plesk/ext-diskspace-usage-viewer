@@ -28,7 +28,7 @@ class Helper
     {
         $list = [];
         $result = \pm_ApiCli::callSbin('diskspace_usage.sh', [$path]);
-        $lines = explode("\n", $result['stdout']);
+        $lines = explode("\n", trim($result['stdout']));
 
         foreach ($lines as $line) {
             $arr = explode(' ', $line);
