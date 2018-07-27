@@ -3,7 +3,7 @@
 
 use PleskExt\DiskspaceUsageViewer\Helper;
 
-class IndexController extends \pm_Controller_Action
+class IndexController extends pm_Controller_Action
 {
     private $currentPath = '/';
 
@@ -13,7 +13,7 @@ class IndexController extends \pm_Controller_Action
     {
         parent::init();
 
-        $this->view->headLink()->appendStylesheet(\pm_Context::getBaseUrl() . 'css/styles.css');
+        $this->view->headLink()->appendStylesheet(pm_Context::getBaseUrl() . 'css/styles.css');
 
         $this->view->headScript()->appendFile('https://www.gstatic.com/charts/loader.js');
     }
@@ -109,20 +109,20 @@ class IndexController extends \pm_Controller_Action
 
         $options = [
             'defaultSortField' => 'size',
-            'defaultSortDirection' => \pm_View_List_Simple::SORT_DIR_DOWN,
+            'defaultSortDirection' => pm_View_List_Simple::SORT_DIR_DOWN,
         ];
 
-        $list = new \pm_View_List_Simple($this->view, $this->_request, $options);
+        $list = new pm_View_List_Simple($this->view, $this->_request, $options);
 
         $list->setColumns([
-            \pm_View_List_Simple::COLUMN_SELECTION,
+            pm_View_List_Simple::COLUMN_SELECTION,
             'size' => [
-                'title' => \pm_Locale::lmsg('columnSize'),
+                'title' => pm_Locale::lmsg('columnSize'),
                 'noEscape' => true,
                 'sortable' => true,
             ],
             'path' => [
-                'title' => \pm_Locale::lmsg('columnPath'),
+                'title' => pm_Locale::lmsg('columnPath'),
                 'noEscape' => true,
                 'sortable' => true,
                 'searchable' => true,
@@ -134,11 +134,11 @@ class IndexController extends \pm_Controller_Action
         if (!empty($data)) {
             $listTools = [
                 [
-                    'title' => \pm_Locale::lmsg('buttonDelete'),
+                    'title' => pm_Locale::lmsg('buttonDelete'),
                     'execGroupOperation' => [
                         'skipConfirmation' => false,
                         'subtype' => 'delete',
-                        'locale' => ['confirmOnGroupOperation' => \pm_Locale::lmsg('confirmDelete')],
+                        'locale' => ['confirmOnGroupOperation' => pm_Locale::lmsg('confirmDelete')],
                         'url' => $this->_helper->url('delete-selected'),
                     ],
                     'class' => 'sb-delete-selected',
@@ -155,8 +155,12 @@ class IndexController extends \pm_Controller_Action
 
     public function deleteSelectedAction()
     {
+        if (!$this->_request->isPost()) {
+            throw new pm_Exception('Permission denied');
+        }
+
         $paths = (array) $this->_getParam('ids');
-        $serverFileManager = new \pm_ServerFileManager;
+        $serverFileManager = new pm_ServerFileManager;
 
         foreach ($paths as $path) {
             $path = Helper::cleanPath($path);
