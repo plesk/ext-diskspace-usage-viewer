@@ -3,7 +3,7 @@
 
 use PleskExt\DiskspaceUsageViewer\Helper;
 
-class IndexController extends \pm_Controller_Action
+class IndexController extends pm_Controller_Action
 {
     private $currentPath = '/';
 
@@ -13,7 +13,7 @@ class IndexController extends \pm_Controller_Action
     {
         parent::init();
 
-        $this->view->headLink()->appendStylesheet(\pm_Context::getBaseUrl() . 'css/styles.css');
+        $this->view->headLink()->appendStylesheet(pm_Context::getBaseUrl() . 'css/styles.css');
 
         $this->view->headScript()->appendFile('https://www.gstatic.com/charts/loader.js');
     }
@@ -94,32 +94,35 @@ class IndexController extends \pm_Controller_Action
 
         foreach ($usage as $item) {
             $displayPath = $item['displayName'];
+            $fullPath = $this->getFullPath($item['name']);
 
             if ($item['isDir']) {
-                $displayPath = '<a href="' . $this->_helper->url('index', 'index', null, ['path' => $this->getFullPath($item['name'])]) . '">' . htmlspecialchars($item['displayName']) . '</a>';
+                $displayPath = '<a href="' . $this->_helper->url('index', 'index', null, ['path' => $fullPath]) . '">' . htmlspecialchars($item['displayName']) . '</a>';
             }
 
             $data[] = [
-                'size' => '<span class="hidden">' . str_pad($item['size'], 10, '0', STR_PAD_LEFT) . '</span>' . htmlspecialchars(Helper::formatSize($item['size'])),
+                'id' => $fullPath,
+                'size' => '<span class="hidden">' . str_pad($item['size'], 10, '0', STR_PAD_LEFT) . '</span>' . Helper::formatSize($item['size']),
                 'path' => $displayPath,
             ];
         }
 
         $options = [
             'defaultSortField' => 'size',
-            'defaultSortDirection' => \pm_View_List_Simple::SORT_DIR_DOWN,
+            'defaultSortDirection' => pm_View_List_Simple::SORT_DIR_DOWN,
         ];
 
-        $list = new \pm_View_List_Simple($this->view, $this->_request, $options);
+        $list = new pm_View_List_Simple($this->view, $this->_request, $options);
 
         $list->setColumns([
+            pm_View_List_Simple::COLUMN_SELECTION,
             'size' => [
-                'title' => \pm_Locale::lmsg('columnSize'),
+                'title' => pm_Locale::lmsg('columnSize'),
                 'noEscape' => true,
                 'sortable' => true,
             ],
             'path' => [
-                'title' => \pm_Locale::lmsg('columnPath'),
+                'title' => pm_Locale::lmsg('columnPath'),
                 'noEscape' => true,
                 'sortable' => true,
                 'searchable' => true,
@@ -127,8 +130,66 @@ class IndexController extends \pm_Controller_Action
         ]);
 
         $list->setData($data);
+
+        if (!empty($data)) {
+            $listTools = [
+                [
+                    'title' => pm_Locale::lmsg('buttonDelete'),
+                    'execGroupOperation' => [
+                        'skipConfirmation' => false,
+                        'subtype' => 'delete',
+                        'locale' => ['confirmOnGroupOperation' => pm_Locale::lmsg('confirmDelete')],
+                        'url' => $this->_helper->url('delete-selected'),
+                    ],
+                    'class' => 'sb-delete-selected',
+                ],
+            ];
+
+            $list->setTools($listTools);
+        }
+
         $list->setDataUrl($this->_helper->url('index-data', 'index', null, ['path' => $currentPath]));
 
         return $list;
+    }
+
+    public function deleteSelectedAction()
+    {
+        if (!$this->_request->isPost()) {
+            throw new pm_Exception('Permission denied');
+        }
+
+        $paths = (array) $this->_getParam('ids');
+        $serverFileManager = new pm_ServerFileManager;
+
+        foreach ($paths as $path) {
+            $path = Helper::cleanPath($path);
+
+            if ($serverFileManager->isDir($path)) {
+                $serverFileManager->removeDirectory($path);
+            } else {
+                $serverFileManager->removeFile($path);
+            }
+        }
+
+        $parentPath = '/';
+
+        if (!empty($paths)) {
+            $path = trim(Helper::cleanPath($paths[0]), '/');
+
+            if ($path != '') {
+                $segments = explode('/', $path);
+
+                array_pop($segments);
+
+                if (count($segments) > 0) {
+                    $parentPath = '/' . implode('/', $segments);
+                }
+            }
+        }
+
+        $url = $this->_helper->url('index', 'index', null, ['path' => $parentPath]);
+
+        $this->redirect($url);
     }
 }
