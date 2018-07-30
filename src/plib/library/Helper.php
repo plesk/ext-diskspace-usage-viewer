@@ -26,21 +26,29 @@ class Helper
 
     public static function getDiskspaceUsage($path)
     {
-        $list = [];
-        $result = \pm_ApiCli::callSbin('diskspace_usage.sh', [$path]);
+        $client = \pm_Session::getClient();
+
+        if ($client->isAdmin()) {
+            $result = \pm_ApiCli::callSbin('diskspace_usage.sh', [$path]);
+        } else {
+            $username = $client->getLogin();
+            $result = \pm_ApiCli::callSbin('diskspace_usage.sh', [$path, $username]);
+        }
+
         $lines = explode("\n", trim($result['stdout']));
+        $list = [];
 
         foreach ($lines as $line) {
             $arr = explode(' ', $line);
-            $size = (int)array_shift($arr);
-            $name = trim(array_shift($arr));
+            $size = (int) $arr[0];
+            $name = trim($arr[1]);
+            $type = (int) $arr[2];
 
             if ($name == '.') {
                 continue;
             }
 
-            $type = trim(implode(' ', $arr));
-            $isDir = ($type == 'directory') ? true : false;
+            $isDir = ($type === 0) ? true : false;
 
             $list[] = [
                 'size' => $size,
