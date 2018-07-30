@@ -9,7 +9,7 @@ class IndexController extends pm_Controller_Action
     private $currentPath = '/';
     private $basePath = '/';
 
-    protected $_accessLevel = ['admin', 'client'];
+    protected $_accessLevel = ['admin', 'reseller', 'client'];
 
     public function init()
     {

@@ -31,7 +31,7 @@ class Helper
         if ($client->isAdmin()) {
             $result = \pm_ApiCli::callSbin('diskspace_usage.sh', [$path]);
         } else {
-            $username = $client->getLogin();
+            $username = \pm_Session::getCurrentDomain()->getSysUserLogin();
             $result = \pm_ApiCli::callSbin('diskspace_usage.sh', [$path, $username]);
         }
 
