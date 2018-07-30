@@ -8,4 +8,6 @@ $messages = [
     'columnPath' => 'Path',
     'buttonDelete' => 'Delete selected',
     'confirmDelete' => 'Are you sure you want to permanently delete selected files / folders?',
+    'menuTitle' => 'Diskspace Usage',
+    'menuDescription' => 'Find folders with most used diskspace and easily free up some space.',
 ];

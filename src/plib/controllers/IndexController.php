@@ -5,13 +5,25 @@ use PleskExt\DiskspaceUsageViewer\Helper;
 
 class IndexController extends pm_Controller_Action
 {
+    private $client;
     private $currentPath = '/';
+    private $basePath = '/';
 
-    protected $_accessLevel = 'admin';
+    protected $_accessLevel = ['admin', 'reseller', 'client'];
 
     public function init()
     {
         parent::init();
+
+        $this->client = pm_Session::getClient();
+
+        if ($this->client->isAdmin()) {
+            $this->setCurrentPath('/');
+        } else {
+            $this->basePath = pm_Session::getCurrentDomain()->getHomePath();
+
+            $this->setCurrentPath($this->basePath);
+        }
 
         $this->view->headLink()->appendStylesheet(pm_Context::getBaseUrl() . 'css/styles.css');
 
@@ -21,7 +33,7 @@ class IndexController extends pm_Controller_Action
     public function indexAction()
     {
         if ($this->_getParam('path')) {
-            $this->setCurrentPath(Helper::cleanPath($this->_getParam('path')));
+            $this->setCurrentPath($this->_getParam('path'));
         }
 
         $usage = Helper::getDiskspaceUsage($this->currentPath);
@@ -39,7 +51,7 @@ class IndexController extends pm_Controller_Action
     public function indexDataAction()
     {
         if ($this->_getParam('path')) {
-            $this->setCurrentPath(Helper::cleanPath($this->_getParam('path')));
+            $this->setCurrentPath($this->_getParam('path'));
         }
 
         $usage = Helper::getDiskspaceUsage($this->currentPath);
@@ -50,10 +62,16 @@ class IndexController extends pm_Controller_Action
 
     private function setCurrentPath($path)
     {
-        $path = trim($path);
+        $path = trim(Helper::cleanPath($path));
 
         if ($path == '') {
             $path = '/';
+        }
+
+        if (!$this->client->isAdmin()) {
+            if (substr($path, 0, strlen($this->basePath)) !== $this->basePath) {
+                $path = $this->basePath;
+            }
         }
 
         $this->currentPath = $path;
