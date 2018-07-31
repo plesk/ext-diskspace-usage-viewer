@@ -4,7 +4,8 @@
   <id>diskspace-usage-viewer</id>
   <name>Diskspace Usage</name>
   <description>Find folders with most used diskspace and easily free up some space.</description>
-  <version>1.0</version>
+  <category>client_tool</category>
+  <version>1.0.0</version>
   <release>1</release>
   <vendor>Plesk</vendor>
   <url>https://www.plesk.com</url>
