@@ -91,7 +91,7 @@ class IndexController extends pm_Controller_Action
         $path = trim($this->currentPath, '/');
 
         if ($path == '') {
-            return '<a href="' . $this->_helper->url('index', 'index', null, ['path' => $currentPath]) . '">/</a>';
+            return '<a href="' . $this->_helper->url('index', 'index', null, ['path' => '/']) . '">/</a>';
         }
 
         $names = explode('/', $path);
