@@ -7,7 +7,7 @@ use PleskExt\DiskspaceUsageViewer\Task\Scan;
 
 class Helper
 {
-    const CACHE_LIFETIME = 300;
+    const CACHE_LIFETIME = 3600;
 
     public static function formatSize($kb)
     {
