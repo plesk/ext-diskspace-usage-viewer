@@ -197,15 +197,15 @@ class IndexController extends pm_Controller_Action
         }
 
         $paths = (array) $this->_getParam('ids');
-        $serverFileManager = new pm_ServerFileManager;
+        $fileManager = $this->client->isAdmin() ? new pm_ServerFileManager : new pm_FileManager(pm_Session::getCurrentDomain()->getId());
 
         foreach ($paths as $path) {
             $path = Helper::cleanPath($path);
 
-            if ($serverFileManager->isDir($path)) {
-                $serverFileManager->removeDirectory($path);
+            if ($fileManager->isDir($path)) {
+                $fileManager->removeDirectory($path);
             } else {
-                $serverFileManager->removeFile($path);
+                $fileManager->removeFile($path);
             }
         }
 
