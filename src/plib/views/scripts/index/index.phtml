@@ -10,6 +10,15 @@ echo $this->renderList($this->list);
 ?>
 
 <script>
+function extDiskspaceUsageViewerRefresh(path) {
+    new Ajax.Request('/modules/diskspace-usage-viewer/index.php/index/refresh?path=' + encodeURIComponent(path), {
+        method: 'post',
+        onSuccess: function (resp) {
+            Jsw.getComponent('asyncProgressBarWrapper').progressDialog(resp.responseJSON);
+        }
+    });
+}
+
 google.charts.load('current', {'packages':['corechart']});
 
 google.charts.setOnLoadCallback(function () {
@@ -30,4 +39,9 @@ google.charts.setOnLoadCallback(function () {
 
     chart.draw(data, options);
 });
+
+<?php if ($this->needUpdateCache): ?>
+extDiskspaceUsageViewerRefresh(<?=json_encode($this->path)?>);
+<?php endif ?>
+
 </script>
