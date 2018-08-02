@@ -7,6 +7,8 @@ use PleskExt\DiskspaceUsageViewer\Helper;
 
 class Scan extends \pm_LongTask_Task
 {
+    public $poolSize = 1;
+
     public function run()
     {
         $client = \pm_Session::getClient();
@@ -66,22 +68,5 @@ class Scan extends \pm_LongTask_Task
         }
 
         return '';
-    }
-
-    public function onDone()
-    {
-        $this->markTaskFinished();
-    }
-
-    public function onError(\Exception $e)
-    {
-        $this->markTaskFinished();
-    }
-
-    private function markTaskFinished()
-    {
-        $setting = 'task_running_' . sha1($this->getParam('path'));
-
-        \pm_Settings::set($setting, 'false');
     }
 }

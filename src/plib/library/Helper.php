@@ -70,14 +70,6 @@ class Helper
 
     public static function startTask($path)
     {
-        $setting = 'task_running_' . sha1($path);
-
-        if (\pm_Settings::get($setting, 'false') == 'true') {
-            return;
-        }
-
-        \pm_Settings::set($setting, 'true');
-
         $taskManager = new \pm_LongTask_Manager;
         $task = new Scan;
 
