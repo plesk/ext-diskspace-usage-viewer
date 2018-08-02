@@ -113,10 +113,10 @@ class IndexController extends pm_Controller_Action
 
         foreach ($names as $name) {
             $currentPath .= '/' . $name;
-            $breadcrumbs[] = '<a href="' . $this->_helper->url('index', 'index', null, ['path' => $currentPath]) . '">' . htmlspecialchars($name) . '/</a>';
+            $breadcrumbs[] = '<a href="' . $this->_helper->url('index', 'index', null, ['path' => $currentPath]) . '">' . htmlspecialchars($name) . '</a> /';
         }
 
-        return implode(' ', $breadcrumbs);
+        return '<b>' . implode(' ', $breadcrumbs) . '</b>';
     }
 
     private function getUsageList($currentPath, array $usage)
