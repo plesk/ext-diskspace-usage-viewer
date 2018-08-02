@@ -11,14 +11,12 @@ class Scan extends \pm_LongTask_Task
 
     public function run()
     {
-        $client = \pm_Session::getClient();
         $path = $this->getParam('path');
 
-        if ($client->isAdmin()) {
+        if ($this->getParam('isAdmin')) {
             $result = \pm_ApiCli::callSbin('diskspace_usage.sh', [$path]);
         } else {
-            $username = \pm_Session::getCurrentDomain()->getSysUserLogin();
-            $result = \pm_ApiCli::callSbin('diskspace_usage.sh', [$path, $username]);
+            $result = \pm_ApiCli::callSbin('diskspace_usage.sh', [$path, $this->getParam('username')]);
         }
 
         $lines = explode("\n", trim($result['stdout']));
