@@ -3,8 +3,12 @@
 
 namespace PleskExt\DiskspaceUsageViewer;
 
+use PleskExt\DiskspaceUsageViewer\Task\Scan;
+
 class Helper
 {
+    const CACHE_LIFETIME = 300;
+
     public static function formatSize($kb)
     {
         if ($kb > 1048576) {
@@ -24,40 +28,64 @@ class Helper
         return $path;
     }
 
+    public static function getCacheFile($path)
+    {
+        $cacheDir = \pm_Context::getVarDir() . 'cache';
+
+        if (!is_dir($cacheDir)) {
+            mkdir($cacheDir, 0700);
+        }
+
+        return $cacheDir . DIRECTORY_SEPARATOR . sha1($path) . '.json';
+    }
+
     public static function getDiskspaceUsage($path)
     {
-        $client = \pm_Session::getClient();
+        $cacheFile = self::getCacheFile($path);
 
-        if ($client->isAdmin()) {
-            $result = \pm_ApiCli::callSbin('diskspace_usage.sh', [$path]);
-        } else {
-            $username = \pm_Session::getCurrentDomain()->getSysUserLogin();
-            $result = \pm_ApiCli::callSbin('diskspace_usage.sh', [$path, $username]);
+        if (!is_file($cacheFile)) {
+            return [];
         }
 
-        $lines = explode("\n", trim($result['stdout']));
-        $list = [];
+        return json_decode(file_get_contents($cacheFile), true);
+    }
 
-        foreach ($lines as $line) {
-            $arr = explode(' ', $line);
-            $size = (int) $arr[0];
-            $name = trim($arr[1]);
-            $type = (int) $arr[2];
+    public static function needUpdateCache($path)
+    {
+        $cacheFile = self::getCacheFile($path);
 
-            if ($name == '.') {
-                continue;
-            }
-
-            $isDir = ($type === 0) ? true : false;
-
-            $list[] = [
-                'size' => $size,
-                'name' => $name,
-                'isDir' => $isDir,
-                'displayName' => $isDir ? $name . '/' : $name,
-            ];
+        if (!is_file($cacheFile)) {
+            return true;
         }
 
-        return $list;
+        $lastModified = filemtime($cacheFile);
+        $maxLifetime = time() - self::CACHE_LIFETIME;
+
+        if ((time() - $lastModified) >= self::CACHE_LIFETIME) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public static function startTask($path)
+    {
+        $setting = 'task_running_' . sha1($path);
+
+        if (\pm_Settings::get($setting, 'false') == 'true') {
+            return;
+        }
+
+        \pm_Settings::set($setting, 'true');
+
+        $taskManager = new \pm_LongTask_Manager;
+        $task = new Scan;
+
+        $task->setParam('path', $path);
+        $task->setParam('redirect', \pm_Context::getActionUrl('index', 'index?path=' . rawurlencode($path)));
+
+        $taskManager->start($task);
+
+        return $task;
     }
 }

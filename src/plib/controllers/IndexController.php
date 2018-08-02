@@ -46,6 +46,8 @@ class IndexController extends pm_Controller_Action
         $this->view->pageTitle = $this->lmsg('pageTitle', ['path' => $this->getCurrentPathBreadcrumb()]);
         $this->view->chartData = $chartData;
         $this->view->list = $this->getUsageList($this->currentPath, $usage);
+        $this->view->path = $this->currentPath;
+        $this->view->needUpdateCache = Helper::needUpdateCache($this->currentPath);
     }
 
     public function indexDataAction()
@@ -58,6 +60,17 @@ class IndexController extends pm_Controller_Action
         $list = $this->getUsageList($this->currentPath, $usage);
 
         $this->_helper->json($list->fetchData());
+    }
+
+    public function refreshAction()
+    {
+        if (!$this->_request->isPost()) {
+            throw new pm_Exception('Permission denied');
+        }
+
+        $task = Helper::startTask($this->_getParam('path'));
+
+        $this->_helper->json($task);
     }
 
     private function setCurrentPath($path)
@@ -95,11 +108,11 @@ class IndexController extends pm_Controller_Action
         }
 
         $names = explode('/', $path);
-        $currentPath = '/';
-        $breadcrumbs = ['<a href="' . $this->_helper->url('index', 'index', null, ['path' => $currentPath]) . '">/</a>'];
+        $breadcrumbs = ['<a href="' . $this->_helper->url('index', 'index', null, ['path' => '/']) . '">/</a>'];
+        $currentPath = '';
 
         foreach ($names as $name) {
-            $currentPath .= $name . '/';
+            $currentPath .= '/' . $name;
             $breadcrumbs[] = '<a href="' . $this->_helper->url('index', 'index', null, ['path' => $currentPath]) . '">' . htmlspecialchars($name) . '/</a>';
         }
 
@@ -152,6 +165,11 @@ class IndexController extends pm_Controller_Action
 
         if (!empty($data)) {
             $listTools = [
+                [
+                    'title' => pm_Locale::lmsg('buttonRefresh'),
+                    'class' => 'sb-refresh',
+                    'link' => 'javascript:extDiskspaceUsageViewerRefresh(' . json_encode($currentPath) . ')',
+                ],
                 [
                     'title' => pm_Locale::lmsg('buttonDelete'),
                     'execGroupOperation' => [
@@ -206,6 +224,8 @@ class IndexController extends pm_Controller_Action
                 }
             }
         }
+
+        unlink(Helper::getCacheFile($parentPath));
 
         $url = $this->_helper->url('index', 'index', null, ['path' => $parentPath]);
 
