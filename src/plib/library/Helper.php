@@ -33,7 +33,7 @@ class Helper
         $cacheDir = \pm_Context::getVarDir() . 'cache';
 
         if (!is_dir($cacheDir)) {
-            mkdir($cacheDir, 0700);
+            mkdir($cacheDir, 0700, true);
         }
 
         return $cacheDir . DIRECTORY_SEPARATOR . sha1($path) . '.json';
