@@ -41,7 +41,9 @@ google.charts.setOnLoadCallback(function () {
 });
 
 <?php if ($this->needUpdateCache): ?>
-extDiskspaceUsageViewerRefresh(<?=json_encode($this->path)?>);
+Jsw.onReady(function () {
+    extDiskspaceUsageViewerRefresh(<?=json_encode($this->path)?>);
+});
 <?php endif ?>
 
 </script>
