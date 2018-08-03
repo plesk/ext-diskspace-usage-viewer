@@ -17,7 +17,17 @@ class IndexController extends pm_Controller_Action
 
         $this->client = pm_Session::getClient();
 
-        if ($this->client->isAdmin()) {
+        if ($this->_getParam('dom_id')) {
+            $domainId = $this->_getParam('dom_id');
+
+            if (!$this->client->hasAccessToDomain($domainId)) {
+                throw new pm_Exception('Access denied');
+            }
+
+            $this->basePath = pm_Domain::getByDomainId($domainId)->getHomePath();
+
+            $this->setCurrentPath($this->basePath);
+        } elseif ($this->client->isAdmin()) {
             $this->setCurrentPath('/');
         } else {
             $this->basePath = pm_Session::getCurrentDomain()->getHomePath();

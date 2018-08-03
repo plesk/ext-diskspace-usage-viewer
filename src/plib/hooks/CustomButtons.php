@@ -26,6 +26,7 @@ class Modules_DiskspaceUsageViewer_CustomButtons extends pm_Hook_CustomButtons
                 'description' => pm_Locale::lmsg('menuDescription'),
                 'link' => pm_Context::getBaseUrl(),
                 'icon' => pm_Context::getBaseUrl() . 'img/32x32.png',
+                'contextParams' => true,
             ],
         ];
     }
