@@ -21,7 +21,7 @@ class IndexController extends pm_Controller_Action
             $domainId = $this->_getParam('dom_id');
 
             if (!$this->client->hasAccessToDomain($domainId)) {
-                throw new Exception('Access denied');
+                throw new pm_Exception('Access denied');
             }
 
             $this->basePath = pm_Domain::getByDomainId($domainId)->getHomePath();
