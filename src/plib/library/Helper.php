@@ -39,6 +39,11 @@ class Helper
         return $cacheDir . DIRECTORY_SEPARATOR . sha1($path) . '.json';
     }
 
+    public static function getTaskIdFile($path)
+    {
+        return self::getCacheFile($path) . '.task';
+    }
+
     public static function getDiskspaceUsage($path)
     {
         $cacheFile = self::getCacheFile($path);
@@ -47,11 +52,15 @@ class Helper
             return [];
         }
 
-        return json_decode(file_get_contents($cacheFile), true);
+        return (array) json_decode(file_get_contents($cacheFile), true);
     }
 
     public static function needUpdateCache($path)
     {
+        if (is_file(self::getTaskIdFile($path))) {
+            return false;
+        }
+
         $cacheFile = self::getCacheFile($path);
 
         if (!is_file($cacheFile)) {
@@ -70,6 +79,12 @@ class Helper
 
     public static function startTask($path)
     {
+        $taskIdFile = self::getTaskIdFile($path);
+
+        if (is_file($taskIdFile)) {
+            return null;
+        }
+
         $taskManager = new \pm_LongTask_Manager;
         $task = new Scan;
 
@@ -80,6 +95,27 @@ class Helper
 
         $taskManager->start($task);
 
+        file_put_contents($taskIdFile, $task->getInstanceId());
+
         return $task;
+    }
+
+    public static function getRunningTask($path)
+    {
+        $taskIdFile = self::getTaskIdFile($path);
+
+        if (!is_file($taskIdFile)) {
+            return null;
+        }
+
+        $instanceId = file_get_contents($taskIdFile);
+        $taskManager = new \pm_LongTask_Manager;
+        $tasks = $taskManager->getTasks(['task\scan']);
+
+        foreach ($tasks as $task) {
+            if ($task->getInstanceId() == $instanceId) {
+                return $task;
+            }
+        }
     }
 }

@@ -53,11 +53,17 @@ class IndexController extends pm_Controller_Action
             $chartData[] = [$item['displayName'], $item['size'], $item['displayName']];
         }
 
+        $runningTask = Helper::getRunningTask($this->currentPath);
+
+        if (!$runningTask && Helper::needUpdateCache($this->currentPath)) {
+            $runningTask = Helper::startTask($this->currentPath);
+        }
+
         $this->view->pageTitle = $this->lmsg('pageTitle', ['path' => $this->getCurrentPathBreadcrumb()]);
         $this->view->chartData = $chartData;
         $this->view->list = $this->getUsageList($this->currentPath, $usage);
         $this->view->path = $this->currentPath;
-        $this->view->needUpdateCache = Helper::needUpdateCache($this->currentPath);
+        $this->view->runningTask = $runningTask;
     }
 
     public function indexDataAction()

@@ -40,10 +40,9 @@ google.charts.setOnLoadCallback(function () {
     chart.draw(data, options);
 });
 
-<?php if ($this->needUpdateCache): ?>
+<?php if ($this->runningTask): ?>
 Jsw.onReady(function () {
-    extDiskspaceUsageViewerRefresh(<?=json_encode($this->path)?>);
+    Jsw.getComponent('asyncProgressBarWrapper').progressDialog(<?= json_encode($this->runningTask->toArray()) ?>);
 });
 <?php endif ?>
-
 </script>
