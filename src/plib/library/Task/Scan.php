@@ -7,8 +7,6 @@ use PleskExt\DiskspaceUsageViewer\Helper;
 
 class Scan extends \pm_LongTask_Task
 {
-    public $poolSize = 1;
-
     public function run()
     {
         $path = $this->getParam('path');
@@ -42,9 +40,7 @@ class Scan extends \pm_LongTask_Task
             ];
         }
 
-        $cacheFile = Helper::getCacheFile($path);
-
-        file_put_contents($cacheFile, json_encode($list));
+        file_put_contents(Helper::getCacheFile($path), json_encode($list));
     }
 
     public function getSteps()
@@ -66,5 +62,22 @@ class Scan extends \pm_LongTask_Task
         }
 
         return '';
+    }
+
+    public function onError(\Exception $e)
+    {
+        $this->deleteTaskIdFile();
+    }
+
+    public function onDone()
+    {
+        $this->deleteTaskIdFile();
+    }
+
+    private function deleteTaskIdFile()
+    {
+        $path = $this->getParam('path');
+
+        unlink(Helper::getTaskIdFile($path));
     }
 }
