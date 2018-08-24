@@ -64,6 +64,7 @@ class IndexController extends pm_Controller_Action
         $this->view->list = $this->getUsageList($this->currentPath, $usage);
         $this->view->path = $this->currentPath;
         $this->view->runningTask = $runningTask;
+        $this->view->isEmptyDir = empty($usage);
     }
 
     public function indexDataAction()

@@ -13,4 +13,5 @@ $messages = [
     'menuDescription' => 'Find folders with most used diskspace and easily free up some space.',
     'scanTaskRunning' => 'Calculating diskspace usage in %%path%%',
     'scanTaskDone' => 'Finished calculation of %%path%%',
+    'messageEmptyDir' => 'The directory is empty.',
 ];
