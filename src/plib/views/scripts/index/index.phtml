@@ -3,9 +3,15 @@
 
 echo '<p>' . \pm_Locale::lmsg('pageDescription') . '</p>';
 
-echo '<div id="piechart" style="width: 800px; height: 400px;"></div>';
+if ($this->isEmptyDir) {
+    if (!$this->runningTask) {
+        echo '<p style="text-align: center;">' . htmlspecialchars(\pm_Locale::lmsg('messageEmptyDir')) . '</p>';
+    }
+} else {
+    echo '<div id="piechart" style="width: 800px; height: 400px;"></div>';
 
-echo $this->renderList($this->list);
+    echo $this->renderList($this->list);
+}
 
 ?>
 
@@ -19,6 +25,7 @@ function extDiskspaceUsageViewerRefresh(path) {
     });
 }
 
+<?php if (!$this->isEmptyDir): ?>
 google.charts.load('current', {'packages':['corechart']});
 
 google.charts.setOnLoadCallback(function () {
@@ -39,6 +46,7 @@ google.charts.setOnLoadCallback(function () {
 
     chart.draw(data, options);
 });
+<?php endif ?>
 
 <?php if ($this->runningTask): ?>
 Jsw.onReady(function () {
