@@ -48,6 +48,7 @@ class Scan extends \pm_LongTask_Task
         return [
             [
                 'title' => \pm_Locale::lmsg('scanTaskRunning', ['path' => $this->getParam('path')]),
+                'icon' => \pm_Context::getBaseUrl() . 'img/sync.png',
             ]
         ];
     }
