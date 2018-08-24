@@ -4,7 +4,9 @@
 echo '<p>' . \pm_Locale::lmsg('pageDescription') . '</p>';
 
 if ($this->isEmptyDir) {
-    echo '<p style="text-align: center;">' . htmlspecialchars(\pm_Locale::lmsg('messageEmptyDir')) . '</p>';
+    if (!$this->runningTask) {
+        echo '<p style="text-align: center;">' . htmlspecialchars(\pm_Locale::lmsg('messageEmptyDir')) . '</p>';
+    }
 } else {
     echo '<div id="piechart" style="width: 800px; height: 400px;"></div>';
 
