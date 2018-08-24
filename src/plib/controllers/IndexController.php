@@ -11,6 +11,17 @@ class IndexController extends pm_Controller_Action
 
     protected $_accessLevel = ['admin', 'reseller', 'client'];
 
+    private function getActionUrl($controller, $action, array $params = [])
+    {
+        $url = pm_Context::getActionUrl($controller, $action);
+
+        if (!empty($params)) {
+            $url .= '?' . http_build_query($params);
+        }
+
+        return $url;
+    }
+
     public function init()
     {
         parent::init();
@@ -121,16 +132,16 @@ class IndexController extends pm_Controller_Action
         $path = trim($this->currentPath, '/');
 
         if ($path == '') {
-            return '<a href="' . $this->_helper->url('index', 'index', null, ['path' => '/']) . '">/</a>';
+            return '<a href="' . $this->getActionUrl('index', 'index', ['path' => '/']) . '">/</a>';
         }
 
         $names = explode('/', $path);
-        $breadcrumbs = ['<a href="' . $this->_helper->url('index', 'index', null, ['path' => '/']) . '">/</a>'];
+        $breadcrumbs = ['<a href="' . $this->getActionUrl('index', 'index', ['path' => '/']) . '">/</a>'];
         $currentPath = '';
 
         foreach ($names as $name) {
             $currentPath .= '/' . $name;
-            $breadcrumbs[] = '<a href="' . $this->_helper->url('index', 'index', null, ['path' => $currentPath]) . '">' . htmlspecialchars($name) . '</a> /';
+            $breadcrumbs[] = '<a href="' . $this->getActionUrl('index', 'index', ['path' => $currentPath]) . '">' . htmlspecialchars($name) . '</a> /';
         }
 
         return '<b>' . implode(' ', $breadcrumbs) . '</b>';
@@ -145,7 +156,7 @@ class IndexController extends pm_Controller_Action
             $fullPath = $this->getFullPath($item['name']);
 
             if ($item['isDir']) {
-                $displayPath = '<a href="' . $this->_helper->url('index', 'index', null, ['path' => $fullPath]) . '">' . htmlspecialchars($item['displayName']) . '</a>';
+                $displayPath = '<a href="' . $this->getActionUrl('index', 'index', ['path' => $fullPath]) . '">' . htmlspecialchars($item['displayName']) . '</a>';
             }
 
             $data[] = [
@@ -193,7 +204,7 @@ class IndexController extends pm_Controller_Action
                         'skipConfirmation' => false,
                         'subtype' => 'delete',
                         'locale' => ['confirmOnGroupOperation' => pm_Locale::lmsg('confirmDelete')],
-                        'url' => $this->_helper->url('delete-selected'),
+                        'url' => $this->getActionUrl('index', 'delete-selected'),
                     ],
                     'class' => 'sb-delete-selected',
                 ],
@@ -202,7 +213,7 @@ class IndexController extends pm_Controller_Action
             $list->setTools($listTools);
         }
 
-        $list->setDataUrl($this->_helper->url('index-data', 'index', null, ['path' => $currentPath]));
+        $list->setDataUrl($this->getActionUrl('index', 'index-data', ['path' => $currentPath]));
 
         return $list;
     }
@@ -244,7 +255,7 @@ class IndexController extends pm_Controller_Action
 
         unlink(Helper::getCacheFile($parentPath));
 
-        $url = $this->_helper->url('index', 'index', null, ['path' => $parentPath]);
+        $url = $this->getActionUrl('index', 'index', ['path' => $parentPath]);
 
         $this->redirect($url);
     }
