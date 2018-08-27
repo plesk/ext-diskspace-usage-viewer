@@ -20,7 +20,15 @@ class Modules_DiskspaceUsageViewer_CustomButtons extends pm_Hook_CustomButtons
                 'link' => pm_Context::getBaseUrl(),
                 'icon' => pm_Context::getBaseUrl() . 'img/32x32.png',
                 'contextParams' => true,
+                'visibility' => [$this, 'isDomainButtonVisible'],
             ],
         ];
+    }
+
+    public function isDomainButtonVisible(array $params)
+    {
+        $domainId = isset($params['dom_id']) ? $params['dom_id'] : 0;
+
+        return pm_Domain::getByDomainId($domainId)->hasHosting();
     }
 }
