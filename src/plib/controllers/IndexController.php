@@ -230,10 +230,14 @@ class IndexController extends pm_Controller_Action
         foreach ($paths as $path) {
             $path = Helper::cleanPath($path);
 
-            if ($fileManager->isDir($path)) {
-                $fileManager->removeDirectory($path);
+            if (method_exists($fileManager, 'isDir')) {
+                if ($fileManager->isDir($path)) {
+                    $fileManager->removeDirectory($path);
+                } else {
+                    $fileManager->removeFile($path);
+                }
             } else {
-                $fileManager->removeFile($path);
+                $fileManager->removeDirectory($path);
             }
         }
 
