@@ -87,9 +87,14 @@ class Helper
 
         $taskManager = new \pm_LongTask_Manager;
         $task = new Scan;
+        $isAdmin = \pm_Session::getClient()->isAdmin();
 
-        $task->setParam('isAdmin', \pm_Session::getClient()->isAdmin());
-        $task->setParam('username', \pm_Session::getCurrentDomain()->getSysUserLogin());
+        $task->setParam('isAdmin', $isAdmin);
+
+        if (!$isAdmin) {
+            $task->setParam('username', \pm_Session::getCurrentDomain()->getSysUserLogin());
+        }
+
         $task->setParam('path', $path);
         $task->setParam('redirect', \pm_Context::getActionUrl('index', 'index?path=' . rawurlencode($path)));
 
