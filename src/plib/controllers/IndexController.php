@@ -28,14 +28,14 @@ class IndexController extends pm_Controller_Action
 
         $this->client = pm_Session::getClient();
 
-        if ($this->_getParam('dom_id')) {
-            $domainId = $this->_getParam('dom_id');
+        if ($this->_getParam('site_id')) {
+            $siteId = $this->_getParam('site_id');
 
-            if (!$this->client->hasAccessToDomain($domainId)) {
+            if (!$this->client->hasAccessToDomain($siteId)) {
                 throw new pm_Exception('Access denied');
             }
 
-            $this->basePath = pm_Domain::getByDomainId($domainId)->getHomePath();
+            $this->basePath = pm_Domain::getByDomainId($siteId)->getDocumentRoot();
 
             $this->setCurrentPath($this->basePath);
         } elseif ($this->client->isAdmin()) {
@@ -218,6 +218,18 @@ class IndexController extends pm_Controller_Action
         return $list;
     }
 
+    private function isRootPath($path)
+    {
+        $path = trim($path, '/');
+
+        if (strpos($path, '/') === false)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
     public function deleteSelectedAction()
     {
         if (!$this->_request->isPost()) {
@@ -229,6 +241,10 @@ class IndexController extends pm_Controller_Action
 
         foreach ($paths as $path) {
             $path = Helper::cleanPath($path);
+
+            if ($this->isRootPath($path)) {
+                throw new pm_Exception(pm_Locale::lmsg('messageCannotDeleteSystemFile', ['path' => $path]));
+            }
 
             if (method_exists($fileManager, 'isDir')) {
                 if ($fileManager->isDir($path)) {
