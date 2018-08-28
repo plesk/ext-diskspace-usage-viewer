@@ -14,4 +14,5 @@ $messages = [
     'scanTaskRunning' => 'Calculating diskspace usage in %%path%%',
     'scanTaskDone' => 'Finished calculation of %%path%%',
     'messageEmptyDir' => 'The directory is empty.',
+    'messageCannotDeleteSystemFile' => 'Cannot delete system file: %%path%%',
 ];

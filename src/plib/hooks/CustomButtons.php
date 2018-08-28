@@ -40,8 +40,12 @@ class Modules_DiskspaceUsageViewer_CustomButtons extends pm_Hook_CustomButtons
 
     public function isDomainButtonVisible(array $params)
     {
-        $domainId = isset($params['dom_id']) ? $params['dom_id'] : 0;
+        if (isset($params['alias_id'])) {
+            return false;
+        }
 
-        return pm_Domain::getByDomainId($domainId)->hasHosting();
+        $siteId = isset($params['site_id']) ? $params['site_id'] : 0;
+
+        return pm_Domain::getByDomainId($siteId)->hasHosting();
     }
 }
