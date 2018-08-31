@@ -41,7 +41,7 @@ class Scan extends \pm_LongTask_Task
             if (method_exists($fileManager, 'isDir')) {
                 $isDir = $fileManager->isDir($fullPath);
             } else {
-                $isDir = $fileManager->fileExists($fullPath + '/');
+                $isDir = $fileManager->fileExists($fullPath . '/');
             }
 
             $list[] = [
