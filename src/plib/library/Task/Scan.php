@@ -37,7 +37,12 @@ class Scan extends \pm_LongTask_Task
             }
 
             $fullPath = $path . DIRECTORY_SEPARATOR . $baseName;
-            $isDir = $fileManager->isDir($fullPath);
+
+            if (method_exists($fileManager, 'isDir')) {
+                $isDir = $fileManager->isDir($fullPath);
+            } else {
+                $isDir = $fileManager->fileExists($fullPath + '/');
+            }
 
             $list[] = [
                 'size' => $kiloBytes,
