@@ -8,4 +8,4 @@ fi
 
 cd "$1"
 
-du -a -d 1
+du -a -d 1 || echo ""
