@@ -17,7 +17,7 @@ class Scan extends \pm_LongTask_Task
             $result = \pm_ApiCli::callSbin('diskspace_usage.sh', [$path, $this->getParam('username')]);
         }
 
-        $fileManager = $this->getParam('isAdmin') ? new \pm_ServerFileManager : new \pm_FileManager(\pm_Session::getCurrentDomain()->getId());
+        $fileManager = $this->getParam('isAdmin') ? new \pm_ServerFileManager : new \pm_FileManager($this->getParam('domainId'));
         $lines = explode("\n", trim($result['stdout']));
         $list = [];
 
