@@ -22,20 +22,20 @@ class Scan extends \pm_LongTask_Task
         $list = [];
 
         foreach ($lines as $line) {
-            $line = preg_replace('/\s+/', ' ', trim($line));
-            $pos = strpos($line, ' ');
+            $segments = preg_split('/\s+/', $line);
 
-            if ($pos === false) {
+            if (count($segments) < 2) {
                 continue;
             }
 
-            $kiloBytes = (int)substr($line, 0, $pos);
-            $baseName = ltrim(substr($line, $pos + 1), './');
+            $kiloBytes = (int)array_shift($segments);
+            $baseName = implode(' ', $segments);
 
-            if ($baseName === '') {
+            if ($baseName === '.') {
                 continue;
             }
 
+            $baseName = substr($baseName, 2);
             $fullPath = $path . DIRECTORY_SEPARATOR . $baseName;
 
             if (method_exists($fileManager, 'isDir')) {
