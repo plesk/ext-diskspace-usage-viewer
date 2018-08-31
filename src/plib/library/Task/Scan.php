@@ -17,28 +17,43 @@ class Scan extends \pm_LongTask_Task
             $result = \pm_ApiCli::callSbin('diskspace_usage.sh', [$path, $this->getParam('username')]);
         }
 
+        $fileManager = $this->getParam('isAdmin') ? new \pm_ServerFileManager : new \pm_FileManager(\pm_Session::getCurrentDomain()->getId());
         $lines = explode("\n", trim($result['stdout']));
         $list = [];
 
         foreach ($lines as $line) {
-            $arr = explode(' ', $line);
-            $size = (int) $arr[0];
-            $name = trim($arr[1]);
-            $type = (int) $arr[2];
+            $line = preg_replace('/\s+/', ' ', trim($line));
+            $pos = strpos($line, ' ');
 
-            if ($name == '.') {
+            if ($pos === false) {
                 continue;
             }
 
-            $isDir = ($type === 0) ? true : false;
+            $kiloBytes = (int)substr($line, 0, $pos);
+            $baseName = ltrim(substr($line, $pos + 1), './');
+
+            if ($baseName === '') {
+                continue;
+            }
+
+            $fullPath = $path . DIRECTORY_SEPARATOR . $baseName;
+            $isDir = $fileManager->isDir($fullPath);
 
             $list[] = [
-                'size' => $size,
-                'name' => $name,
+                'size' => $kiloBytes,
+                'name' => $baseName,
                 'isDir' => $isDir,
-                'displayName' => $isDir ? $name . '/' : $name,
+                'displayName' => $isDir ? $baseName . '/' : $baseName,
             ];
         }
+
+        usort($list, function ($a, $b) {
+            if ($a['size'] === $b['size']) {
+                return 0;
+            }
+
+            return ($a['size'] < $b['size']) ? 1 : -1;
+        });
 
         file_put_contents(Helper::getCacheFile($path), json_encode($list));
     }

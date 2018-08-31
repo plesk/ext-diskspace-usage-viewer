@@ -8,4 +8,4 @@ fi
 
 cd "$1"
 
-du -a -d 1 | sed 's#.\/##g' | sort -nr | awk '{size=$1; name=$2; $1=""; is_dir="test -d "$0; is_dir |& getline; print size,name,close(is_dir)}'
+du -a -d 1
