@@ -6,7 +6,7 @@
   <description>Find folders with most used diskspace and easily free up some space.</description>
   <category>client_tool</category>
   <version>1.0.0</version>
-  <release>1</release>
+  <release>{{RELEASE}}</release>
   <vendor>Plesk</vendor>
   <url>https://www.plesk.com</url>
   <plesk_min_version>17.0</plesk_min_version>
