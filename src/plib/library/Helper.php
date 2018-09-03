@@ -12,11 +12,11 @@ class Helper
     public static function formatSize($kb)
     {
         if ($kb > 1048576) {
-            return round($kb / 1048576, 1) . '&nbsp;GB';
+            return round($kb / 1048576, 1) . ' GB';
         } else if ($kb > 1024) {
-            return round($kb / 1024, 1) . '&nbsp;MB';
+            return round($kb / 1024, 1) . ' MB';
         } else {
-            return round($kb, 1) . '&nbsp;KB';
+            return round($kb, 1) . ' KB';
         }
     }
 
@@ -93,10 +93,11 @@ class Helper
 
         if (!$isAdmin) {
             $task->setParam('username', \pm_Session::getCurrentDomain()->getSysUserLogin());
+            $task->setParam('domainId', \pm_Session::getCurrentDomain()->getId());
         }
 
         $task->setParam('path', $path);
-        $task->setParam('redirect', \pm_Context::getActionUrl('index', 'index?path=' . rawurlencode($path)));
+        $task->setParam('redirect', self::getActionUrl('index', ['path' => $path]));
 
         $taskManager->start($task);
 
@@ -122,5 +123,16 @@ class Helper
                 return $task;
             }
         }
+    }
+
+    public static function getActionUrl($action, array $params = [])
+    {
+        $url = \pm_Context::getActionUrl('index', $action);
+
+        if (!empty($params)) {
+            $url .= '?' . http_build_query($params);
+        }
+
+        return $url;
     }
 }

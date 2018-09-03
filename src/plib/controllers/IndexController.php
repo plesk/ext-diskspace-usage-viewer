@@ -11,17 +11,6 @@ class IndexController extends pm_Controller_Action
 
     protected $_accessLevel = ['admin', 'reseller', 'client'];
 
-    private function getActionUrl($action, array $params = [])
-    {
-        $url = pm_Context::getActionUrl('index', $action);
-
-        if (!empty($params)) {
-            $url .= '?' . http_build_query($params);
-        }
-
-        return $url;
-    }
-
     public function init()
     {
         parent::init();
@@ -72,7 +61,7 @@ class IndexController extends pm_Controller_Action
 
         $this->view->pageTitle = $this->lmsg('pageTitle', ['path' => $this->getCurrentPathBreadcrumb()]);
         $this->view->chartData = $chartData;
-        $this->view->list = $this->getUsageList($this->currentPath, $usage);
+        $this->view->list = $this->getUsageList($usage);
         $this->view->path = $this->currentPath;
         $this->view->runningTask = $runningTask;
         $this->view->isEmptyDir = empty($usage);
@@ -85,7 +74,7 @@ class IndexController extends pm_Controller_Action
         }
 
         $usage = Helper::getDiskspaceUsage($this->currentPath);
-        $list = $this->getUsageList($this->currentPath, $usage);
+        $list = $this->getUsageList($usage);
 
         $this->_helper->json($list->fetchData());
     }
@@ -118,104 +107,29 @@ class IndexController extends pm_Controller_Action
         $this->currentPath = $path;
     }
 
-    private function getFullPath($folderName)
-    {
-        if (substr($this->currentPath, -1) == '/') {
-            return $this->currentPath . $folderName;
-        } else {
-            return $this->currentPath . '/' . $folderName;
-        }
-    }
-
     private function getCurrentPathBreadcrumb()
     {
         $path = trim($this->currentPath, '/');
 
         if ($path == '') {
-            return '<a href="' . $this->getActionUrl('index', ['path' => '/']) . '">/</a>';
+            return '<a href="' . Helper::getActionUrl('index', ['path' => '/']) . '">/</a>';
         }
 
         $names = explode('/', $path);
-        $breadcrumbs = ['<a href="' . $this->getActionUrl('index', ['path' => '/']) . '">/</a>'];
+        $breadcrumbs = ['<a href="' . Helper::getActionUrl('index', ['path' => '/']) . '">/</a>'];
         $currentPath = '';
 
         foreach ($names as $name) {
             $currentPath .= '/' . $name;
-            $breadcrumbs[] = '<a href="' . $this->getActionUrl('index', ['path' => $currentPath]) . '">' . htmlspecialchars($name) . '</a> /';
+            $breadcrumbs[] = '<a href="' . Helper::getActionUrl('index', ['path' => $currentPath]) . '">' . htmlspecialchars($name) . '</a> /';
         }
 
         return '<b>' . implode(' ', $breadcrumbs) . '</b>';
     }
 
-    private function getUsageList($currentPath, array $usage)
+    private function getUsageList(array $usage)
     {
-        $data = [];
-
-        foreach ($usage as $item) {
-            $displayPath = $item['displayName'];
-            $fullPath = $this->getFullPath($item['name']);
-
-            if ($item['isDir']) {
-                $displayPath = '<a href="' . $this->getActionUrl('index', ['path' => $fullPath]) . '">' . htmlspecialchars($item['displayName']) . '</a>';
-            }
-
-            $data[] = [
-                'id' => $fullPath,
-                'path' => $displayPath,
-                'size' => '<span class="hidden">' . str_pad($item['size'], 10, '0', STR_PAD_LEFT) . '</span>' . Helper::formatSize($item['size']),
-            ];
-        }
-
-        $options = [
-            'defaultSortField' => 'size',
-            'defaultSortDirection' => pm_View_List_Simple::SORT_DIR_DOWN,
-        ];
-
-        $list = new pm_View_List_Simple($this->view, $this->_request, $options);
-
-        $list->setColumns([
-            pm_View_List_Simple::COLUMN_SELECTION,
-            'path' => [
-                'title' => pm_Locale::lmsg('columnPath'),
-                'noEscape' => true,
-                'sortable' => true,
-                'searchable' => true,
-            ],
-            'size' => [
-                'title' => pm_Locale::lmsg('columnSize'),
-                'noEscape' => true,
-                'sortable' => true,
-                'cls' => 'number t-r',
-            ],
-        ]);
-
-        $list->setData($data);
-
-        if (!empty($data)) {
-            $listTools = [
-                [
-                    'title' => pm_Locale::lmsg('buttonRefresh'),
-                    'class' => 'sb-refresh',
-                    'link' => 'javascript:extDiskspaceUsageViewerRefresh(' . json_encode($currentPath) . ')',
-                ],
-                [
-                    'title' => pm_Locale::lmsg('buttonDelete'),
-                    'execGroupOperation' => [
-                        'skipConfirmation' => false,
-                        'subtype' => 'delete',
-                        'locale' => ['confirmOnGroupOperation' => pm_Locale::lmsg('confirmDelete')],
-                        'url' => $this->getActionUrl('delete-selected'),
-                    ],
-                    'class' => 'sb-delete-selected',
-                ],
-            ];
-
-            $list->setTools($listTools);
-        }
-
-        $list->setDataUrl($this->getActionUrl('index-data', ['path' => $currentPath]));
-
-        return $list;
+        return new \PleskExt\DiskspaceUsageViewer\UsageList($this->view, $this->_request, $this->currentPath, $usage);
     }
 
     private function isRootPath($path)
@@ -275,7 +189,7 @@ class IndexController extends pm_Controller_Action
 
         unlink(Helper::getCacheFile($parentPath));
 
-        $url = $this->getActionUrl('index', ['path' => $parentPath]);
+        $url = Helper::getActionUrl('index', ['path' => $parentPath]);
 
         $this->redirect($url);
     }

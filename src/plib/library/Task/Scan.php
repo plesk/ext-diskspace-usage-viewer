@@ -17,26 +17,38 @@ class Scan extends \pm_LongTask_Task
             $result = \pm_ApiCli::callSbin('diskspace_usage.sh', [$path, $this->getParam('username')]);
         }
 
+        $fileManager = $this->getParam('isAdmin') ? new \pm_ServerFileManager : new \pm_FileManager($this->getParam('domainId'));
         $lines = explode("\n", trim($result['stdout']));
         $list = [];
 
         foreach ($lines as $line) {
-            $arr = explode(' ', $line);
-            $size = (int) $arr[0];
-            $name = trim($arr[1]);
-            $type = (int) $arr[2];
+            $segments = preg_split('/\s+/', $line);
 
-            if ($name == '.') {
+            if (count($segments) < 2) {
                 continue;
             }
 
-            $isDir = ($type === 0) ? true : false;
+            $kiloBytes = (int)array_shift($segments);
+            $baseName = implode(' ', $segments);
+
+            if ($baseName === '.') {
+                continue;
+            }
+
+            $baseName = substr($baseName, 2);
+            $fullPath = $path . DIRECTORY_SEPARATOR . $baseName;
+
+            if (method_exists($fileManager, 'isDir')) {
+                $isDir = $fileManager->isDir($fullPath);
+            } else {
+                $isDir = $fileManager->fileExists($fullPath . '/');
+            }
 
             $list[] = [
-                'size' => $size,
-                'name' => $name,
+                'size' => $kiloBytes,
+                'name' => $baseName,
                 'isDir' => $isDir,
-                'displayName' => $isDir ? $name . '/' : $name,
+                'displayName' => $isDir ? $baseName . '/' : $baseName,
             ];
         }
 
