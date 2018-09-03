@@ -93,10 +93,10 @@ class Helper
 
         if (!$isAdmin) {
             $task->setParam('username', \pm_Session::getCurrentDomain()->getSysUserLogin());
+            $task->setParam('domainId', \pm_Session::getCurrentDomain()->getId());
         }
 
         $task->setParam('path', $path);
-        $task->setParam('domainId', \pm_Session::getCurrentDomain()->getId());
         $task->setParam('redirect', self::getActionUrl('index', ['path' => $path]));
 
         $taskManager->start($task);
