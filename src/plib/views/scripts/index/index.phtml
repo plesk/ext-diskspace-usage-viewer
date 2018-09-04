@@ -8,7 +8,9 @@ if ($this->isEmptyDir) {
         echo '<p style="text-align: center;">' . htmlspecialchars(\pm_Locale::lmsg('messageEmptyDir')) . '</p>';
     }
 } else {
-    echo '<div id="piechart" style="width: 800px; height: 400px;"></div>';
+    if ($this->dirSize > 0) {
+        echo '<div id="piechart" style="width: 800px; height: 400px;"></div>';
+    }
 
     echo $this->renderList($this->list);
 }
@@ -25,7 +27,7 @@ function extDiskspaceUsageViewerRefresh(path) {
     });
 }
 
-<?php if (!$this->isEmptyDir): ?>
+<?php if ($this->dirSize > 0): ?>
 google.charts.load('current', {'packages':['corechart']});
 
 google.charts.setOnLoadCallback(function () {
