@@ -5,15 +5,13 @@ echo '<p>' . \pm_Locale::lmsg('pageDescription') . '</p>';
 
 if ($this->isEmptyDir) {
     if (!$this->runningTask) {
-        echo '<p style="text-align: center;">' . htmlspecialchars(\pm_Locale::lmsg('messageEmptyDir')) . '</p>';
+        echo '<p>' . htmlspecialchars(\pm_Locale::lmsg('messageEmptyDir')) . '</p>';
     }
-} else {
-    if ($this->dirSize > 0) {
-        echo '<div id="piechart" style="width: 800px; height: 400px;"></div>';
-    }
-
-    echo $this->renderList($this->list);
+} elseif ($this->dirSize > 0) {
+    echo '<div id="piechart" style="width: 800px; height: 400px;"></div>';
 }
+
+echo $this->renderList($this->list);
 
 ?>
 
