@@ -59,12 +59,19 @@ class IndexController extends pm_Controller_Action
             $runningTask = Helper::startTask($this->currentPath);
         }
 
+        $dirSize = 0;
+
+        foreach ($usage as $item) {
+            $dirSize += $item['size'];
+        }
+
         $this->view->pageTitle = $this->lmsg('pageTitle', ['path' => $this->getCurrentPathBreadcrumb()]);
         $this->view->chartData = $chartData;
         $this->view->list = $this->getUsageList($usage);
         $this->view->path = $this->currentPath;
         $this->view->runningTask = $runningTask;
         $this->view->isEmptyDir = empty($usage);
+        $this->view->dirSize = $dirSize;
     }
 
     public function indexDataAction()

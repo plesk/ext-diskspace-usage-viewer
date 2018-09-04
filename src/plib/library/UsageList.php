@@ -88,6 +88,8 @@ class UsageList extends \pm_View_List_Simple
         foreach ($data['data'] as &$row) {
             if ($row['isDir']) {
                 $row['path'] = '<a href="' . htmlspecialchars(Helper::getActionUrl('index', ['path' => $row['id']])) . '">' . htmlspecialchars($row['path']) . '</a>';
+            } else {
+                $row['path'] = htmlspecialchars($row['path']);
             }
 
             $row['size'] = htmlspecialchars(Helper::formatSize($row['size']));
