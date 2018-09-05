@@ -60,25 +60,23 @@ class UsageList extends \pm_View_List_Simple
 
         $this->setDataUrl(Helper::getActionUrl('index-data', ['path' => $currentPath]));
 
-        if (!empty($data)) {
-            $this->setTools([
-                [
-                    'title' => \pm_Locale::lmsg('buttonRefresh'),
-                    'class' => 'sb-refresh',
-                    'link' => 'javascript:extDiskspaceUsageViewerRefresh(' . json_encode($currentPath) . ')',
+        $this->setTools([
+            [
+                'title' => \pm_Locale::lmsg('buttonRefresh'),
+                'class' => 'sb-refresh',
+                'link' => 'javascript:extDiskspaceUsageViewerRefresh(' . json_encode($currentPath) . ')',
+            ],
+            [
+                'title' => \pm_Locale::lmsg('buttonDelete'),
+                'execGroupOperation' => [
+                    'skipConfirmation' => false,
+                    'subtype' => 'delete',
+                    'locale' => ['confirmOnGroupOperation' => \pm_Locale::lmsg('confirmDelete')],
+                    'url' => Helper::getActionUrl('delete-selected'),
                 ],
-                [
-                    'title' => \pm_Locale::lmsg('buttonDelete'),
-                    'execGroupOperation' => [
-                        'skipConfirmation' => false,
-                        'subtype' => 'delete',
-                        'locale' => ['confirmOnGroupOperation' => \pm_Locale::lmsg('confirmDelete')],
-                        'url' => Helper::getActionUrl('delete-selected'),
-                    ],
-                    'class' => 'sb-delete-selected',
-                ],
-            ]);
-        }
+                'class' => 'sb-delete-selected',
+            ],
+        ]);
     }
 
     public function fetchData()
