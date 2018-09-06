@@ -6,6 +6,7 @@ use PleskExt\DiskspaceUsageViewer\Helper;
 class IndexController extends pm_Controller_Action
 {
     private $client;
+    private $fileManager;
     private $currentPath = '/';
     private $basePath = '/';
 
@@ -16,6 +17,7 @@ class IndexController extends pm_Controller_Action
         parent::init();
 
         $this->client = pm_Session::getClient();
+        $this->fileManager = $this->client->isAdmin() ? new pm_ServerFileManager : new pm_FileManager(pm_Session::getCurrentDomain()->getId());
 
         if ($this->_getParam('site_id')) {
             $siteId = $this->_getParam('site_id');
@@ -107,6 +109,10 @@ class IndexController extends pm_Controller_Action
             }
         }
 
+        if (!Helper::isDir($path, $this->fileManager)) {
+            $path = $this->basePath;
+        }
+
         $this->currentPath = $path;
     }
 
@@ -154,8 +160,6 @@ class IndexController extends pm_Controller_Action
         }
 
         $paths = (array) $this->_getParam('ids');
-        $fileManager = $this->client->isAdmin() ? new pm_ServerFileManager : new pm_FileManager(pm_Session::getCurrentDomain()->getId());
-
         foreach ($paths as $path) {
             $path = Helper::cleanPath($path);
 
@@ -163,14 +167,10 @@ class IndexController extends pm_Controller_Action
                 throw new pm_Exception(pm_Locale::lmsg('messageCannotDeleteSystemFile', ['path' => $path]));
             }
 
-            if (method_exists($fileManager, 'isDir')) {
-                if ($fileManager->isDir($path)) {
-                    $fileManager->removeDirectory($path);
-                } else {
-                    $fileManager->removeFile($path);
-                }
+            if (Helper::isDir($path, $this->fileManager)) {
+                $this->fileManager->removeDirectory($path);
             } else {
-                $fileManager->removeDirectory($path);
+                $this->fileManager->removeFile($path);
             }
         }
 
