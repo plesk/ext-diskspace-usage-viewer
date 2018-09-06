@@ -23,9 +23,17 @@ class Helper
     public static function cleanPath($path)
     {
         $path = str_replace('\\', '/', $path);
-        $path = str_replace('../', '', $path);
+        $segments = explode('/', $path);
 
-        return $path;
+        $segments = array_filter($segments, function ($segment) {
+            if (in_array($segment, ['', '.', '..'])) {
+                return false;
+            }
+
+            return true;
+        });
+
+        return '/' . implode('/', $segments);
     }
 
     public static function getCacheFile($path)

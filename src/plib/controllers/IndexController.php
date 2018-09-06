@@ -101,10 +101,6 @@ class IndexController extends pm_Controller_Action
     {
         $path = trim(Helper::cleanPath($path));
 
-        if ($path == '') {
-            $path = '/';
-        }
-
         if (!$this->client->isAdmin()) {
             if (substr($path, 0, strlen($this->basePath)) !== $this->basePath) {
                 $path = $this->basePath;
