@@ -143,4 +143,17 @@ class Helper
 
         return $url;
     }
+
+    /**
+     * @param string $path
+     * @return bool
+     */
+    public static function isDir($path, \pm_FileManager $fileManager)
+    {
+        if (method_exists($fileManager, 'isDir')) {
+            return $fileManager->isDir($path);
+        } else {
+            return $fileManager->fileExists($path . '/');
+        }
+    }
 }
