@@ -15,4 +15,5 @@ $messages = [
     'scanTaskDone' => 'Finished calculation of %%path%%',
     'messageEmptyDir' => 'The directory is empty.',
     'messageCannotDeleteSystemFile' => 'Cannot delete system file: %%path%%',
+    'messageDeleteInsufficientPermissions' => 'Insufficient permissions to delete: %%path%%',
 ];
