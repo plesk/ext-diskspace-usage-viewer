@@ -51,7 +51,7 @@ class IndexController extends pm_Controller_Action
         $usage = Helper::getDiskspaceUsage($this->currentPath);
         $chartData = [];
 
-        foreach (array_slice($usage, 0, 10) as $item) {
+        foreach ($usage as $item) {
             $chartData[] = [$item['displayName'], $item['size'], $item['displayName']];
         }
 
