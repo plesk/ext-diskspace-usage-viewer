@@ -156,4 +156,18 @@ class Helper
             return $fileManager->fileExists($path . '/');
         }
     }
+
+    /**
+     * @param string $path
+     * @param int $maxLen
+     * @return string
+     */
+    public static function truncatePath($path, $maxLen)
+    {
+        if (mb_strlen($path) < $maxLen) {
+            return $path;
+        }
+
+        return '...' . mb_substr($path, -$maxLen);
+    }
 }

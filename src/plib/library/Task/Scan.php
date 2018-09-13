@@ -52,9 +52,11 @@ class Scan extends \pm_LongTask_Task
 
     public function getSteps()
     {
+        $path = Helper::truncatePath($this->getParam('path'), 40);
+
         return [
             [
-                'title' => \pm_Locale::lmsg('scanTaskRunning', ['path' => $this->getParam('path')]),
+                'title' => \pm_Locale::lmsg('scanTaskRunning', ['path' => $path]),
                 'icon' => \pm_Context::getBaseUrl() . 'img/sync.png',
             ]
         ];
