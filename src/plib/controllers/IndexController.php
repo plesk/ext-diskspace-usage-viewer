@@ -167,10 +167,14 @@ class IndexController extends pm_Controller_Action
                 throw new pm_Exception(pm_Locale::lmsg('messageCannotDeleteSystemFile', ['path' => $path]));
             }
 
-            if (Helper::isDir($path, $this->fileManager)) {
-                $this->fileManager->removeDirectory($path);
-            } else {
-                $this->fileManager->removeFile($path);
+            try {
+                if (Helper::isDir($path, $this->fileManager)) {
+                    $this->fileManager->removeDirectory($path);
+                } else {
+                    $this->fileManager->removeFile($path);
+                }
+            } catch (PleskUtilException $e) {
+                throw new pm_Exception(pm_Locale::lmsg('messageDeleteInsufficientPermissions', ['path' => $path]));
             }
         }
 
