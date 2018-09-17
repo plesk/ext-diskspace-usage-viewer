@@ -5,6 +5,8 @@ use PleskExt\DiskspaceUsageViewer\Helper;
 
 class IndexController extends pm_Controller_Action
 {
+    const MAX_PIE_CHART_SLICES = 10;
+
     private $client;
     private $fileManager;
     private $currentPath = '/';
@@ -51,8 +53,29 @@ class IndexController extends pm_Controller_Action
         $usage = Helper::getDiskspaceUsage($this->currentPath);
         $chartData = [];
 
-        foreach (array_slice($usage, 0, 10) as $item) {
-            $chartData[] = [$item['displayName'], $item['size'], $item['displayName']];
+        if (count($usage) > self::MAX_PIE_CHART_SLICES)
+        {
+            $top = array_slice($usage, 0, self::MAX_PIE_CHART_SLICES);
+            $other = array_slice($usage, self::MAX_PIE_CHART_SLICES);
+
+            foreach ($top as $item) {
+                $chartData[] = [$item['displayName'], $item['size'], $item['displayName']];
+            }
+
+            $otherSize = 0;
+
+            foreach ($other as $item) {
+                $otherSize += $item['size'];
+            }
+
+            $label = pm_Locale::lmsg('labelOtherFilesAndDirectories');
+            $chartData[] = [$label, $otherSize, $label];
+        }
+        else
+        {
+            foreach ($usage as $item) {
+                $chartData[] = [$item['displayName'], $item['size'], $item['displayName']];
+            }
         }
 
         $runningTask = Helper::getRunningTask($this->currentPath);
