@@ -19,7 +19,6 @@ class IndexController extends pm_Controller_Action
         parent::init();
 
         $this->client = pm_Session::getClient();
-        $this->fileManager = $this->client->isAdmin() ? new pm_ServerFileManager : new pm_FileManager(pm_Session::getCurrentDomain()->getId());
 
         if ($this->_getParam('site_id')) {
             $siteId = $this->_getParam('site_id');
@@ -28,12 +27,16 @@ class IndexController extends pm_Controller_Action
                 throw new pm_Exception('Access denied');
             }
 
+            $this->fileManager = new pm_FileManager($siteId);
             $this->basePath = pm_Domain::getByDomainId($siteId)->getDocumentRoot();
 
             $this->setCurrentPath($this->basePath);
         } elseif ($this->client->isAdmin()) {
+            $this->fileManager = new pm_ServerFileManager;
+
             $this->setCurrentPath('/');
         } else {
+            $this->fileManager = new pm_FileManager(pm_Session::getCurrentDomain()->getId());
             $this->basePath = pm_Session::getCurrentDomain()->getHomePath();
 
             $this->setCurrentPath($this->basePath);
