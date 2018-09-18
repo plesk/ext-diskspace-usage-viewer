@@ -39,7 +39,8 @@ google.charts.setOnLoadCallback(function () {
 
     var options = {
         title: '',
-        is3D: true
+        is3D: true,
+        sliceVisibilityThreshold: 0
     };
 
     var chart = new google.visualization.PieChart(document.getElementById('piechart'));
