@@ -7,19 +7,12 @@ class Modules_DiskspaceUsageViewer_CustomButtons extends pm_Hook_CustomButtons
     {
         return [
             [
-                'place' => self::PLACE_ADMIN_NAVIGATION,
+                'place' => self::PLACE_DOMAIN,
                 'title' => pm_Locale::lmsg('menuTitle'),
                 'description' => pm_Locale::lmsg('menuDescription'),
                 'link' => pm_Context::getBaseUrl(),
-                'icon' => pm_Context::getBaseUrl() . 'img/16x16.png',
-            ],
-            [
-                'place' => self::PLACE_HOSTING_PANEL_NAVIGATION,
-                'title' => pm_Locale::lmsg('menuTitle'),
-                'description' => pm_Locale::lmsg('menuDescription'),
-                'link' => pm_Context::getBaseUrl(),
-                'icon' => pm_Context::getBaseUrl() . 'img/16x16.png',
-                'visibility' => [$this, 'isHostingButtonVisible'],
+                'icon' => pm_Context::getBaseUrl() . 'img/32x32.png',
+                'visibility' => [$this, 'isDomainButtonVisible'],
             ],
             [
                 'place' => self::PLACE_DOMAIN_PROPERTIES,
@@ -28,17 +21,17 @@ class Modules_DiskspaceUsageViewer_CustomButtons extends pm_Hook_CustomButtons
                 'link' => pm_Context::getBaseUrl(),
                 'icon' => pm_Context::getBaseUrl() . 'img/32x32.png',
                 'contextParams' => true,
-                'visibility' => [$this, 'isDomainButtonVisible'],
+                'visibility' => [$this, 'isDomainPropertiesButtonVisible'],
             ],
         ];
     }
 
-    public function isHostingButtonVisible(array $params)
+    public function isDomainButtonVisible(array $params)
     {
         return pm_Session::getClient()->isAdmin();
     }
 
-    public function isDomainButtonVisible(array $params)
+    public function isDomainPropertiesButtonVisible(array $params)
     {
         if (isset($params['alias_id'])) {
             return false;
