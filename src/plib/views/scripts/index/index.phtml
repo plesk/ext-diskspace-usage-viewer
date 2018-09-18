@@ -8,6 +8,7 @@ if ($this->isEmptyDir) {
         echo '<p>' . htmlspecialchars(\pm_Locale::lmsg('messageEmptyDir')) . '</p>';
     }
 } elseif ($this->dirSize > 0) {
+    echo '<p>Total directory size: <strong>' . \PleskExt\DiskspaceUsageViewer\Helper::formatSize($this->dirSize) . '</strong></p>';
     echo '<div id="piechart" style="width: 800px; height: 400px;"></div>';
 }
 
