@@ -7,12 +7,12 @@ class Modules_DiskspaceUsageViewer_CustomButtons extends pm_Hook_CustomButtons
     {
         return [
             [
-                'place' => self::PLACE_DOMAIN,
+                'place' => self::PLACE_ADMIN_TOOLS_AND_SETTINGS,
+                'section' => self::SECTION_ADMIN_TOOLS_TOOLS_AND_RESOURCES,
                 'title' => pm_Locale::lmsg('menuTitle'),
                 'description' => pm_Locale::lmsg('menuDescription'),
                 'link' => pm_Context::getBaseUrl(),
                 'icon' => pm_Context::getBaseUrl() . 'img/32x32.png',
-                'visibility' => [$this, 'isDomainButtonVisible'],
             ],
             [
                 'place' => self::PLACE_DOMAIN_PROPERTIES,
@@ -24,11 +24,6 @@ class Modules_DiskspaceUsageViewer_CustomButtons extends pm_Hook_CustomButtons
                 'visibility' => [$this, 'isDomainPropertiesButtonVisible'],
             ],
         ];
-    }
-
-    public function isDomainButtonVisible(array $params)
-    {
-        return pm_Session::getClient()->isAdmin();
     }
 
     public function isDomainPropertiesButtonVisible(array $params)
