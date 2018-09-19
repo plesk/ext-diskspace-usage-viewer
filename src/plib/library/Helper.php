@@ -60,7 +60,17 @@ class Helper
             return [];
         }
 
-        return (array) json_decode(file_get_contents($cacheFile), true);
+        $usage = (array) json_decode(file_get_contents($cacheFile), true);
+
+        usort($usage, function ($a, $b) {
+            if ($a == $b) {
+                return 0;
+            }
+
+            return ($a < $b) ? 1 : -1;
+        });
+
+        return $usage;
     }
 
     public static function needUpdateCache($path)
