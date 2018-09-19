@@ -17,4 +17,5 @@ $messages = [
     'messageCannotDeleteSystemFile' => 'Cannot delete system file: %%path%%',
     'messageDeleteInsufficientPermissions' => 'Insufficient permissions to delete: %%path%%',
     'labelOtherFilesAndDirectories' => 'Everything else',
+    'labelTotalDirectorySize' => 'Total directory size: <strong>%%size%%</strong>',
 ];
