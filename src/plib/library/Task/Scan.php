@@ -47,6 +47,14 @@ class Scan extends \pm_LongTask_Task
             ];
         }
 
+        usort($list, function ($a, $b) {
+            if ($a['size'] == $b['size']) {
+                return 0;
+            }
+
+            return ($a['size'] < $b['size']) ? 1 : -1;
+        });
+
         file_put_contents(Helper::getCacheFile($path), json_encode($list));
     }
 
