@@ -181,6 +181,10 @@ class IndexController extends pm_Controller_Action
 
     public function deleteSelectedAction()
     {
+        if (!Helper::isDeleteEnabled()) {
+            throw new pm_Exception('Permission denied');
+        }
+
         if (!$this->_request->isPost()) {
             throw new pm_Exception('Permission denied');
         }
