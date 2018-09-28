@@ -5,7 +5,7 @@
   <name>Diskspace Usage</name>
   <description>Find folders with most used diskspace and easily free up some space.</description>
   <category>client_tool</category>
-  <version>1.0.0</version>
+  <version>1.0.1</version>
   <release>{{RELEASE}}</release>
   <vendor>Plesk</vendor>
   <url>https://www.plesk.com</url>
