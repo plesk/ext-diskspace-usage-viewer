@@ -170,4 +170,12 @@ class Helper
 
         return '...' . mb_substr($path, -$maxLen);
     }
+
+    /**
+     * @return bool
+     */
+    public static function isDeleteEnabled()
+    {
+        return (bool) \pm_Config::get('deleteEnabled');
+    }
 }

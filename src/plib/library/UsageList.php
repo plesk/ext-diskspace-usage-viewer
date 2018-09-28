@@ -60,13 +60,16 @@ class UsageList extends \pm_View_List_Simple
 
         $this->setDataUrl(Helper::getActionUrl('index-data', ['path' => $currentPath]));
 
-        $this->setTools([
+        $tools = [
             [
                 'title' => \pm_Locale::lmsg('buttonRefresh'),
                 'class' => 'sb-refresh',
                 'link' => 'javascript:extDiskspaceUsageViewerRefresh(' . json_encode($currentPath) . ')',
             ],
-            [
+        ];
+
+        if (Helper::isDeleteEnabled()) {
+            $tools[] = [
                 'title' => \pm_Locale::lmsg('buttonDelete'),
                 'execGroupOperation' => [
                     'skipConfirmation' => false,
@@ -75,8 +78,10 @@ class UsageList extends \pm_View_List_Simple
                     'url' => Helper::getActionUrl('delete-selected'),
                 ],
                 'class' => 'sb-delete-selected',
-            ],
-        ]);
+            ];
+        }
+
+        $this->setTools($tools);
     }
 
     public function fetchData()
