@@ -6,4 +6,4 @@ If you run out of disk space your question is usually in which folders is the mo
 
 ## Requirements
 
-   * Plesk Onyx 17.* or later
+   * Plesk Onyx 17.8.11 or later
