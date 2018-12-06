@@ -10,17 +10,7 @@ try {
         touch($file);
         chmod($file, 0600);
 
-        $sql = <<<SQL
-CREATE TABLE `cache` (
-    `id` INTEGER PRIMARY KEY AUTOINCREMENT,
-    `hash` TINYTEXT NOT NULL,
-    `size` INTEGER NOT NULL,
-    `expires` INTEGER NOT NULL
-)
-SQL;
-
-        Db::adapter()->query($sql);
-
+        Db::adapter()->query('CREATE TABLE `cache` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `hash` TINYTEXT NOT NULL, `size` INTEGER NOT NULL, `expires` INTEGER NOT NULL)');
         Db::adapter()->query('CREATE UNIQUE INDEX `idx_hash` ON `cache` (`hash`)');
     }
 } catch (\Exception $e) {

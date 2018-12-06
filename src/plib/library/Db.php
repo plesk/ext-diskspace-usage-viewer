@@ -27,14 +27,7 @@ class Db
 
     public static function saveCache(string $path, int $size): void
     {
-        $sql = <<<SQL
-REPLACE INTO `cache`
-(`hash`, `size`, `expires`)
-VALUES
-(:hash, :size, :expires)
-SQL;
-
-        $stmt = self::adapter()->prepare($sql);
+        $stmt = self::adapter()->prepare('REPLACE INTO `cache` (`hash`, `size`, `expires`) VALUES (:hash, :size, :expires)');
 
         $stmt->execute([
             'hash' => sha1($path),
@@ -45,14 +38,7 @@ SQL;
 
     public static function loadCache(string $path): int
     {
-        $sql = <<<SQL
-SELECT `size`
-FROM `cache`
-WHERE `hash` = :hash
-  AND `expires` >= :expires
-SQL;
-
-        $stmt = self::adapter()->prepare($sql);
+        $stmt = self::adapter()->prepare('SELECT `size` FROM `cache` WHERE `hash` = :hash AND `expires` >= :expires');
 
         $stmt->execute([
             'hash' => sha1($path),
