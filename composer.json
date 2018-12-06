@@ -10,9 +10,7 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "PleskExt\\DiskspaceUsageViewer\\": [
-        "src/plib/library/"
-      ]
+      "PleskExt\\DiskspaceUsageViewer\\": "src/plib/library/"
     }
   },
   "require-dev": {
