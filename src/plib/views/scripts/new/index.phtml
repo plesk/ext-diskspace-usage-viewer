@@ -1,0 +1,140 @@
+<?php
+// Copyright 1999-2018. Plesk International GmbH. All rights reserved.
+
+function formatBytes(int $bytes): string
+{
+    if ($bytes == 0) {
+        return '0 B';
+    }
+
+    $k = 1024;
+    $sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+    $i = floor(log($bytes) / log($k));
+
+    return round($bytes / pow($k, $i)) . ' ' . $sizes[$i];
+}
+?>
+
+<div id="chart" style="width: 800px; height: 400px; display: none;"></div>
+
+<table>
+    <thead>
+        <tr>
+            <th>Path</th>
+            <th>Size</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($this->items as $item) { ?>
+        <tr>
+            <td>
+                <?php if ($item['isDir']) { ?>
+                <a href="<?= \pm_Context::getActionUrl('new', 'index') . '?path=' . rawurlencode($item['path']) ?>"><?= htmlspecialchars($item['displayName']); ?></a>
+                <?php } else { ?>
+                <?= htmlspecialchars($item['displayName']); ?>
+                <?php } ?>
+            </td>
+            <td id="col_item_size_<?= $item['id'] ?>"><?= formatBytes($item['size']); ?></td>
+        </tr>
+        <?php } ?>
+    </tbody>
+</table>
+
+<script>
+google.charts.load('current', {'packages': ['corechart'], 'callback': drawChart});
+
+var items = <?= json_encode($this->items) ?>;
+var chartElem = document.getElementById('chart');
+var totalSize = 0;
+
+items.forEach(function (item) {
+    totalSize += item.size;
+});
+
+function drawChart() {
+    if (totalSize == 0) {
+        return;
+    }
+
+    chartElem.style.display = 'block';
+
+    var data = new google.visualization.DataTable();
+
+    data.addColumn('string', 'Name');
+    data.addColumn('number', 'Size');
+    data.addColumn({type: 'string', role: 'tooltip'});
+
+    items.forEach(function (item) {
+        data.addRow([item.displayName, item.size, item.displayName]);
+    });
+
+    var options = {
+        title: '',
+        is3D: true,
+        sliceVisibilityThreshold: 0
+    };
+
+    var chart = new google.visualization.PieChart(chartElem);
+
+    chart.draw(data, options);
+}
+
+function canAccessGoogleVisualization()
+{
+    if ((typeof google === 'undefined') || (typeof google.visualization === 'undefined')) {
+       return false;
+    }
+    else {
+       return true;
+    }
+}
+
+function formatBytes(bytes) {
+    if (bytes == 0) {
+        return '0 B';
+    }
+
+    var k = 1024;
+    var sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+    var i = Math.floor(Math.log(bytes) / Math.log(k));
+
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(0)) + ' ' + sizes[i];
+}
+
+Object.keys(items).forEach(function (key) {
+    var item = items[key];
+
+    if (!item.isDir) {
+        return;
+    }
+
+    if (item.size > 0) {
+        return;
+    }
+
+    new Ajax.Request(Jsw.prepareUrl('/modules/diskspace-usage-viewer/index.php/new/get-dir-size'), {
+        method: 'get',
+        parameters: {
+            'path': item.path
+        },
+        onSuccess: function (response) {
+            var size = parseInt(response.responseText, 10);
+
+            if (isNaN(size)) {
+                size = 0;
+            }
+
+            var col = document.getElementById('col_item_size_' + item.id);
+            col.innerHTML = formatBytes(size);
+
+            items[key].size = size;
+
+            totalSize += size;
+
+            if (canAccessGoogleVisualization()) {
+                drawChart();
+            }
+        }
+    });
+});
+</script>
