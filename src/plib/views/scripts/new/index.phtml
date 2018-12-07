@@ -101,40 +101,48 @@ function formatBytes(bytes) {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(0)) + ' ' + sizes[i];
 }
 
-Object.keys(items).forEach(function (key) {
-    var item = items[key];
+Jsw.onReady(function() {
+    var delay = 0;
 
-    if (!item.isDir) {
-        return;
-    }
+    Object.keys(items).forEach(function (key) {
+        var item = items[key];
 
-    if (item.size > 0) {
-        return;
-    }
-
-    new Ajax.Request(Jsw.prepareUrl('/modules/diskspace-usage-viewer/index.php/new/get-dir-size'), {
-        method: 'get',
-        parameters: {
-            'path': item.path
-        },
-        onSuccess: function (response) {
-            var size = parseInt(response.responseText, 10);
-
-            if (isNaN(size)) {
-                size = 0;
-            }
-
-            var col = document.getElementById('col_item_size_' + item.id);
-            col.innerHTML = formatBytes(size);
-
-            items[key].size = size;
-
-            totalSize += size;
-
-            if (canAccessGoogleVisualization()) {
-                drawChart();
-            }
+        if (!item.isDir) {
+            return;
         }
+
+        if (item.size > 0) {
+            return;
+        }
+
+        setTimeout(function () {
+            new Ajax.Request(Jsw.prepareUrl('/modules/diskspace-usage-viewer/index.php/new/get-dir-size'), {
+                method: 'get',
+                parameters: {
+                    'path': item.path
+                },
+                onSuccess: function (response) {
+                    var size = parseInt(response.responseText, 10);
+
+                    if (isNaN(size)) {
+                        size = 0;
+                    }
+
+                    var col = document.getElementById('col_item_size_' + item.id);
+                    col.innerHTML = formatBytes(size);
+
+                    items[key].size = size;
+
+                    totalSize += size;
+
+                    if (canAccessGoogleVisualization()) {
+                        drawChart();
+                    }
+                }
+            });
+        }, delay);
+
+        delay += 500;
     });
 });
 </script>
