@@ -1,2 +1,10 @@
 # Composer
-/src/plib/vendor/
+/src/plib/vendor
+
+# dependencies
+/node_modules
+
+# misc
+yarn-debug.log*
+yarn-error.log*
+.idea
