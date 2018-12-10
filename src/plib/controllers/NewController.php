@@ -2,6 +2,7 @@
 // Copyright 1999-2018. Plesk International GmbH. All rights reserved.
 
 use PleskExt\DiskspaceUsageViewer\Db;
+use PleskExt\DiskspaceUsageViewer\Cleaner;
 
 class NewController extends \pm_Controller_Action
 {
@@ -100,6 +101,14 @@ class NewController extends \pm_Controller_Action
         $this->_helper->viewRenderer->setNoRender(true);
 
         echo $size;
+    }
+
+    public function cleanupAction()
+    {
+        Cleaner::cleanCache();
+        Cleaner::cleanBackups(30);
+
+        $this->redirect('new/index');
     }
 
     private function cleanPath(string $path): string

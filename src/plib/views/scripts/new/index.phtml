@@ -15,6 +15,10 @@ function formatBytes(int $bytes): string
 }
 ?>
 
+<p>
+    <a href="<?= \pm_Context::getActionUrl('new', 'cleanup') ?>">Auto cleanup</a>
+</p>
+
 <div id="chart" style="width: 800px; height: 400px; display: none;"></div>
 
 <table>
