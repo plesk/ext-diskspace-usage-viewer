@@ -105,8 +105,10 @@ class NewController extends \pm_Controller_Action
 
     public function cleanupAction()
     {
-        Cleaner::cleanCache();
-        Cleaner::cleanBackups(30);
+        if (\pm_Session::getClient()->isAdmin()) {
+            Cleaner::cleanCache();
+            Cleaner::cleanBackups(30);
+        }
 
         $this->redirect('new/index');
     }
