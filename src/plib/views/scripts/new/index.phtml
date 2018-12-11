@@ -25,9 +25,9 @@ function formatBytes(int $bytes): string
 </script>
 
 
-<?php if (\pm_Session::getClient()->isAdmin()) { ?>
+<?php if (\pm_Session::getClient()->isAdmin()): ?>
 <p><a href="<?= \pm_Context::getActionUrl('new', 'cleanup') ?>">Auto cleanup</a></p>
-<?php } ?>
+<?php endif; ?>
 
 <div id="chart" style="width: 800px; height: 400px; display: none;"></div>
 
@@ -39,18 +39,18 @@ function formatBytes(int $bytes): string
     </tr>
     </thead>
     <tbody>
-    <?php foreach ($this->items as $item) { ?>
+        <?php foreach ($this->items as $item): ?>
         <tr>
             <td>
-                <?php if ($item['isDir']) { ?>
-                    <a href="<?= \pm_Context::getActionUrl('new', 'index') . '?path=' . rawurlencode($item['path']) ?>"><?= htmlspecialchars($item['displayName']); ?></a>
-                <?php } else { ?>
-                    <?= htmlspecialchars($item['displayName']); ?>
-                <?php } ?>
+                <?php if ($item['isDir']): ?>
+                <a href="<?= \pm_Context::getActionUrl('new', 'index') . '?path=' . rawurlencode($item['path']) ?>"><?= htmlspecialchars($item['displayName']); ?></a>
+                <?php else: ?>
+                <?= htmlspecialchars($item['displayName']); ?>
+                <?php endif; ?>
             </td>
             <td id="col_item_size_<?= $item['id'] ?>"><?= formatBytes($item['size']); ?></td>
         </tr>
-    <?php } ?>
+        <?php endforeach; ?>
     </tbody>
 </table>
 
