@@ -8,8 +8,83 @@ class NewController extends \pm_Controller_Action
 {
     public function indexAction()
     {
+        $path = $this->getParam('path', '/');
+        $items = $this->getItems($path);
+
+        $this->view->headScript()->appendFile('https://www.gstatic.com/charts/loader.js');
+
+        $this->view->items = $items;
+    }
+
+    public function getDirSizeAction()
+    {
+        $path = $this->getParam('path');
+        $args = [$path];
+
+        if (!\pm_Session::getClient()->isAdmin()) {
+            $args[] = \pm_Session::getCurrentDomain()->getSysUserLogin();
+        }
+
+        $size = 0;
+
+        try {
+            $result = \pm_ApiCli::callSbin('dir_size.sh', $args, \pm_ApiCli::RESULT_EXCEPTION);
+            $output = trim($result['stdout']);
+            $pos = strpos($output, "\t");
+
+            if ($pos !== false) {
+                $size = (int) substr($output, 0, $pos);
+            }
+        } catch (\pm_Exception $e) {
+            \pm_Log::err($e->getMessage());
+        }
+
+        Db::saveCache($path, $size);
+
+        $this->_helper->layout->disableLayout();
+        $this->_helper->viewRenderer->setNoRender(true);
+
+        echo $size;
+    }
+
+    public function getItemsAction()
+    {
+        $path = $this->getParam('path', '/');
+        $items = $this->getItems($path);
+
+        $this->_helper->json($items);
+    }
+
+    public function cleanupAction()
+    {
+        if (\pm_Session::getClient()->isAdmin()) {
+            Cleaner::cleanCache();
+            Cleaner::cleanBackups(30);
+        }
+
+        $this->redirect('new/index');
+    }
+
+    private function cleanPath(string $path): string
+    {
+        $path = trim(str_replace('\\', '/', $path));
+        $segments = explode('/', $path);
+
+        $segments = array_filter($segments, function ($segment) {
+            if (in_array($segment, ['', '.', '..'])) {
+                return false;
+            }
+
+            return true;
+        });
+
+        return '/' . implode('/', $segments);
+    }
+
+    private function getItems(string $path): array
+    {
         $client = \pm_Session::getClient();
-        $curPath = $this->cleanPath($this->getParam('path', '/'));
+        $curPath = $this->cleanPath($path);
 
         if ($client->isAdmin()) {
             $basePath = '/';
@@ -67,65 +142,6 @@ class NewController extends \pm_Controller_Action
             ];
         }
 
-        $this->view->headScript()->appendFile('https://www.gstatic.com/charts/loader.js');
-
-        $this->view->items = $items;
-    }
-
-    public function getDirSizeAction()
-    {
-        $path = $this->getParam('path');
-        $args = [$path];
-
-        if (!\pm_Session::getClient()->isAdmin()) {
-            $args[] = \pm_Session::getCurrentDomain()->getSysUserLogin();
-        }
-
-        $size = 0;
-
-        try {
-            $result = \pm_ApiCli::callSbin('dir_size.sh', $args, \pm_ApiCli::RESULT_EXCEPTION);
-            $output = trim($result['stdout']);
-            $pos = strpos($output, "\t");
-
-            if ($pos !== false) {
-                $size = (int) substr($output, 0, $pos);
-            }
-        } catch (\pm_Exception $e) {
-            \pm_Log::err($e->getMessage());
-        }
-
-        Db::saveCache($path, $size);
-
-        $this->_helper->layout->disableLayout();
-        $this->_helper->viewRenderer->setNoRender(true);
-
-        echo $size;
-    }
-
-    public function cleanupAction()
-    {
-        if (\pm_Session::getClient()->isAdmin()) {
-            Cleaner::cleanCache();
-            Cleaner::cleanBackups(30);
-        }
-
-        $this->redirect('new/index');
-    }
-
-    private function cleanPath(string $path): string
-    {
-        $path = trim(str_replace('\\', '/', $path));
-        $segments = explode('/', $path);
-
-        $segments = array_filter($segments, function ($segment) {
-            if (in_array($segment, ['', '.', '..'])) {
-                return false;
-            }
-
-            return true;
-        });
-
-        return '/' . implode('/', $segments);
+        return $items;
     }
 }
