@@ -9,6 +9,40 @@ class Helper
 {
     const CACHE_LIFETIME = 3600;
 
+    private static $systemFiles = [
+        '/',
+        '/bin',
+        '/boot',
+        '/dev',
+        '/etc',
+        '/home',
+        '/initrd',
+        '/lib',
+        '/lib32',
+        '/lib64',
+        '/proc',
+        '/root',
+        '/sbin',
+        '/sys',
+        '/usr',
+        '/usr/bin',
+        '/usr/include',
+        '/usr/lib',
+        '/usr/local',
+        '/usr/local/bin',
+        '/usr/local/include',
+        '/usr/local/sbin',
+        '/usr/local/share',
+        '/usr/sbin',
+        '/usr/share',
+        '/usr/src',
+        '/var',
+
+        '/opt/plesk',
+        '/opt/psa',
+        '/var/www/vhosts/*/httpdocs',
+    ];
+
     public static function formatSize($kb)
     {
         if ($kb > 1048576) {
@@ -76,7 +110,6 @@ class Helper
         }
 
         $lastModified = filemtime($cacheFile);
-        $maxLifetime = time() - self::CACHE_LIFETIME;
 
         if ((time() - $lastModified) >= self::CACHE_LIFETIME) {
             return true;
@@ -172,10 +205,17 @@ class Helper
     }
 
     /**
+     * @param string $path
      * @return bool
      */
-    public static function isDeleteEnabled()
+    public static function isSystemFile($path)
     {
-        return (bool) \pm_Config::get('deleteEnabled');
+        foreach (self::$systemFiles as $systemFile) {
+            if (fnmatch($systemFile, $path)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
