@@ -30,7 +30,6 @@ class UsageList extends \pm_View_List_Simple
         $this->currentPath = $currentPath;
 
         $this->setColumns([
-            self::COLUMN_SELECTION,
             'path' => [
                 'title' => \pm_Locale::lmsg('columnPath'),
                 'noEscape' => true,
@@ -67,19 +66,6 @@ class UsageList extends \pm_View_List_Simple
                 'link' => 'javascript:extDiskspaceUsageViewerRefresh(' . json_encode($currentPath) . ')',
             ],
         ];
-
-        if (Helper::isDeleteEnabled()) {
-            $tools[] = [
-                'title' => \pm_Locale::lmsg('buttonDelete'),
-                'execGroupOperation' => [
-                    'skipConfirmation' => false,
-                    'subtype' => 'delete',
-                    'locale' => ['confirmOnGroupOperation' => \pm_Locale::lmsg('confirmDelete')],
-                    'url' => Helper::getActionUrl('delete-selected'),
-                ],
-                'class' => 'sb-delete-selected',
-            ];
-        }
 
         $this->setTools($tools);
     }
