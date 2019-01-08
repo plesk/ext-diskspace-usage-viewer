@@ -117,6 +117,13 @@ class NewController extends \pm_Controller_Action
         $this->_helper->json($result);
     }
 
+    public function updateBiggestFilesAction()
+    {
+        Helper::updateBiggestFiles();
+
+        $this->_helper->json(true);
+    }
+
     private function cleanPath(string $path): string
     {
         $path = trim(str_replace('\\', '/', $path));
