@@ -3,8 +3,6 @@
 
 namespace PleskExt\DiskspaceUsageViewer;
 
-use PleskExt\DiskspaceUsageViewer\Helper;
-
 class UsageList extends \pm_View_List_Simple
 {
     private $currentPath;

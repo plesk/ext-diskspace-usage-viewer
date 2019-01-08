@@ -1,8 +1,9 @@
 <?php
 // Copyright 1999-2018. Plesk International GmbH. All rights reserved.
 
-use PleskExt\DiskspaceUsageViewer\Db;
 use PleskExt\DiskspaceUsageViewer\Cleaner;
+use PleskExt\DiskspaceUsageViewer\Db;
+use PleskExt\DiskspaceUsageViewer\Helper;
 
 class NewController extends \pm_Controller_Action
 {
@@ -63,6 +64,64 @@ class NewController extends \pm_Controller_Action
         }
 
         $this->redirect('new/index');
+    }
+
+    public function getBiggestFilesAction()
+    {
+        $this->_helper->json(array_values(Db::getFiles()));
+    }
+
+    public function deleteBiggestFileAction()
+    {
+        if (!$this->getRequest()->isPost()) {
+            throw new \pm_Exception('Permission denied');
+        }
+
+        $id = (int) $this->getParam('id');
+
+        $result = [
+            'success' => true,
+            'message' => '',
+        ];
+
+        try {
+            $files = Db::getFiles();
+
+            if (isset($files[$id])) {
+                $path = $files[$id]['path'];
+
+                if (Helper::isSystemFile($path)) {
+                    $result['success'] = false;
+                    $result['message'] = \pm_Locale::lmsg('messageCannotDeleteSystemFile', ['path' => $path]);
+                } else {
+                    try {
+                        if (\pm_Session::getClient()->isAdmin()) {
+                            $fileManager = new \pm_ServerFileManager;
+                        } else {
+                            $fileManager = new \pm_FileManager(\pm_Session::getCurrentDomain()->getId());
+                        }
+
+                        $fileManager->removeFile($path);
+                        Db::deleteFileById($id);
+                    } catch (\PleskUtilException $e) {
+                        $result['success'] = false;
+                        $result['message'] = \pm_Locale::lmsg('messageDeleteInsufficientPermissions', ['path' => $path]);
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            $result['success'] = false;
+            $result['message'] = $e->getMessage();
+        }
+
+        $this->_helper->json($result);
+    }
+
+    public function updateBiggestFilesAction()
+    {
+        Helper::updateBiggestFiles();
+
+        $this->_helper->json(true);
     }
 
     private function cleanPath(string $path): string

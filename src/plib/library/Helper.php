@@ -41,6 +41,8 @@ class Helper
         '/opt/plesk',
         '/opt/psa',
         '/var/www/vhosts/*/httpdocs',
+        '/pleskswap',
+        '/var/lib/psa/*',
     ];
 
     public static function formatSize($kb)
@@ -217,5 +219,40 @@ class Helper
         }
 
         return false;
+    }
+
+    /**
+     * @return array
+     */
+    public static function updateBiggestFiles()
+    {
+        try {
+            $result = \pm_ApiCli::callSbin('biggest_files.sh', [], \pm_ApiCli::RESULT_EXCEPTION);
+            $lines = explode("\n", $result['stdout']);
+            $files = [];
+
+            foreach ($lines as $line) {
+                $line = trim($line);
+
+                if ($line === '') {
+                    continue;
+                }
+
+                $pos = strpos($line, "\t");
+
+                if ($pos === false) {
+                    continue;
+                }
+
+                $files[] = [
+                    'size' => (int) substr($line, 0, $pos),
+                    'path' => substr($line, $pos + 1),
+                ];
+            }
+
+            Db::saveFiles(array_reverse($files));
+        } catch (\pm_Exception $e) {
+            \pm_Log::err($e->getMessage());
+        }
     }
 }
