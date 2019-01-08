@@ -71,7 +71,7 @@ class NewController extends \pm_Controller_Action
         $this->_helper->json(array_values(Db::getFiles()));
     }
 
-    public function deleteFileAction()
+    public function deleteBiggestFileAction()
     {
         if (!$this->getRequest()->isPost()) {
             throw new \pm_Exception('Permission denied');
