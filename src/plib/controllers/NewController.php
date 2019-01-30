@@ -7,14 +7,47 @@ use PleskExt\DiskspaceUsageViewer\Helper;
 
 class NewController extends \pm_Controller_Action
 {
+    private $client;
+    private $fileManager;
+
+    protected $_accessLevel = ['admin', 'reseller', 'client'];
+
+    public function init()
+    {
+        parent::init();
+
+        $this->client = pm_Session::getClient();
+
+        if ($this->_getParam('site_id')) {
+            $siteId = $this->_getParam('site_id');
+
+            if (!$this->client->hasAccessToDomain($siteId)) {
+                throw new pm_Exception('Access denied');
+            }
+
+            $this->fileManager = new pm_FileManager($siteId);
+
+            return;
+        }
+
+        if ($this->client->isAdmin()) {
+            $this->fileManager = new pm_ServerFileManager;
+
+            return;
+        }
+
+        $this->fileManager = new pm_FileManager(pm_Session::getCurrentDomain()->getId());
+    }
+
     public function indexAction()
     {
         $path = $this->getParam('path', '/');
         $items = $this->getItems($path);
 
-        $this->view->headScript()->appendFile('https://www.gstatic.com/charts/loader.js');
-
+        $this->view->headLink()->appendStylesheet(pm_Context::getBaseUrl() . 'css/styles.css');
         $this->view->items = $items;
+        $this->view->path = $path;
+        $this->view->breadcrumbsPath = $this->createBreadcrumbsPath();
     }
 
     public function getDirSizeAction()
@@ -36,7 +69,8 @@ class NewController extends \pm_Controller_Action
             if ($pos !== false) {
                 $size = (int) substr($output, 0, $pos);
             }
-        } catch (\pm_Exception $e) {
+        }
+        catch (\pm_Exception $e) {
             \pm_Log::err($e->getMessage());
         }
 
@@ -48,6 +82,50 @@ class NewController extends \pm_Controller_Action
         echo $size;
     }
 
+    public function cleanupAction()
+    {
+        if (!\pm_Session::getClient()->isAdmin()) {
+            $response = [
+                'success' => false,
+                'message' => \pm_Locale::lmsg('home.actionButtonCleanUpErrorNoAdmin'),
+            ];
+
+            $this->_helper->json($response);
+        }
+
+        $settingsRequest = json_decode($this->getRequest()->getParam('settings'), true);
+
+        if (empty($settingsRequest['cleanUpSelectionCache']) && empty($settingsRequest['cleanUpSelectionBackup'])) {
+            $response = [
+                'success' => false,
+                'message' => \pm_Locale::lmsg('home.actionButtonCleanUpNoSelection'),
+            ];
+
+            $this->_helper->json($response);
+        }
+
+        if (isset($settingsRequest['cleanUpSelectionCache']) && $settingsRequest['cleanUpSelectionCache'] === true) {
+            Cleaner::cleanCache();
+        }
+
+        if (isset($settingsRequest['cleanUpSelectionBackup']) && $settingsRequest['cleanUpSelectionBackup'] === true) {
+            $cleanUpBackupDays = 90;
+
+            if (isset($settingsRequest['cleanUpBackupDays']) && !empty(intval($settingsRequest['cleanUpBackupDays']))) {
+                $cleanUpBackupDays = intval($settingsRequest['cleanUpBackupDays']);
+            }
+
+            Cleaner::cleanBackups($cleanUpBackupDays);
+        }
+
+        $response = [
+            'success' => true,
+            'message' => \pm_Locale::lmsg('home.actionButtonCleanUpSuccess'),
+        ];
+
+        $this->_helper->json($response);
+    }
+
     public function getItemsAction()
     {
         $path = $this->getParam('path', '/');
@@ -56,19 +134,77 @@ class NewController extends \pm_Controller_Action
         $this->_helper->json($items);
     }
 
-    public function cleanupAction()
+    public function getBreadcrumbsPathAction()
     {
-        if (\pm_Session::getClient()->isAdmin()) {
-            Cleaner::cleanCache();
-            Cleaner::cleanBackups(30);
+        $breadcrumbsPath = $this->createBreadcrumbsPath();
+
+        $this->_helper->json($breadcrumbsPath);
+    }
+
+    public function deleteAction()
+    {
+        if (!$this->_request->isPost()) {
+            throw new pm_Exception('Permission denied');
         }
 
-        $this->redirect('new/index');
+        $response = [
+            'success' => true,
+            'message' => \pm_Locale::lmsg('home.actionButtonDeleteSuccess'),
+        ];
+
+        $rawBody = json_decode($this->getRequest()->getRawBody(), true);
+
+        if (empty($rawBody['paths'])) {
+            $response = [
+                'success' => false,
+                'message' => \pm_Locale::lmsg('home.actionButtonDeleteErrorRequest'),
+            ];
+
+            $this->_helper->json($response);
+        }
+
+        $paths = $rawBody['paths'];
+        $messagesError = [];
+
+        foreach ($paths as $path) {
+            $path = Helper::cleanPath($path);
+
+            if (Helper::isSystemFile($path)) {
+                $messagesError[] = pm_Locale::lmsg('messageCannotDeleteSystemFile', ['path' => $path]);
+
+                continue;
+            }
+
+            try {
+                if (Helper::isDir($path, $this->fileManager)) {
+                    $this->fileManager->removeDirectory($path);
+                } else {
+                    $this->fileManager->removeFile($path);
+                }
+            }
+            catch (\PleskUtilException $e) {
+                $messagesError[] = pm_Locale::lmsg('messageDeleteInsufficientPermissions', ['path' => $path]);
+            }
+        }
+
+        if (!empty($messagesError)) {
+            $response = [
+                'success' => false,
+                'message' => implode("\n", $messagesError),
+            ];
+        }
+
+        $this->_helper->json($response);
     }
 
     public function getBiggestFilesAction()
     {
-        $this->_helper->json(array_values(Db::getFiles()));
+        $result = [
+            'success' => true,
+            'data' => array_values(Db::getFiles()),
+        ];
+
+        $this->_helper->json($result);
     }
 
     public function deleteBiggestFileAction()
@@ -103,13 +239,15 @@ class NewController extends \pm_Controller_Action
 
                         $fileManager->removeFile($path);
                         Db::deleteFileById($id);
-                    } catch (\PleskUtilException $e) {
+                    }
+                    catch (\PleskUtilException $e) {
                         $result['success'] = false;
                         $result['message'] = \pm_Locale::lmsg('messageDeleteInsufficientPermissions', ['path' => $path]);
                     }
                 }
             }
-        } catch (\Exception $e) {
+        }
+        catch (\Exception $e) {
             $result['success'] = false;
             $result['message'] = $e->getMessage();
         }
@@ -129,7 +267,7 @@ class NewController extends \pm_Controller_Action
         $path = trim(str_replace('\\', '/', $path));
         $segments = explode('/', $path);
 
-        $segments = array_filter($segments, function ($segment) {
+        $segments = array_filter($segments, function($segment) {
             if (in_array($segment, ['', '.', '..'])) {
                 return false;
             }
@@ -173,7 +311,8 @@ class NewController extends \pm_Controller_Action
 
             try {
                 $isDir = $fileManager->isDir($path);
-            } catch (\PleskUtilException $e) {
+            }
+            catch (\PleskUtilException $e) {
                 continue;
             }
 
@@ -192,15 +331,49 @@ class NewController extends \pm_Controller_Action
             $id++;
 
             $items[] = [
-                'id' => $id,
-                'name' => $basename,
+                'id'          => $id,
+                'name'        => $basename,
                 'displayName' => $isDir ? ($basename . '/') : $basename,
-                'isDir' => $isDir,
-                'size' => $size,
-                'path' => $path,
+                'isDir'       => $isDir,
+                'size'        => $size,
+                'path'        => $path,
             ];
         }
 
+        $nameArray = [];
+
+        foreach ($items as $key => $row) {
+            $nameArray[$key] = $row['name'];
+        }
+
+        array_multisort($nameArray, SORT_ASC, SORT_NATURAL, $items);
+
         return $items;
+    }
+
+    private function createBreadcrumbsPath()
+    {
+        $breadcrumbsPath = [];
+        $path = $this->cleanPath($this->getParam('path', '/'));
+
+        if ($path === '/') {
+            return $breadcrumbsPath;
+        }
+
+        $pathArray = explode('/', $path);
+        $pathElementList = '';
+
+        foreach ($pathArray as $pathElement) {
+            if (empty($pathElement)) {
+                $breadcrumbsPath[] = ['name' => '/', 'path' => '/'];
+
+                continue;
+            }
+
+            $pathElementList .= '/' . $pathElement;
+            $breadcrumbsPath[] = ['name' => $pathElement, 'path' => $pathElementList];
+        }
+
+        return $breadcrumbsPath;
     }
 }

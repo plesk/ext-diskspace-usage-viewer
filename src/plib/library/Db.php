@@ -30,8 +30,8 @@ class Db
         $stmt = self::adapter()->prepare('REPLACE INTO `cache` (`hash`, `size`, `expires`) VALUES (:hash, :size, :expires)');
 
         $stmt->execute([
-            'hash' => sha1($path),
-            'size' => $size,
+            'hash'    => sha1($path),
+            'size'    => $size,
             'expires' => time() + 3600,
         ]);
     }
@@ -41,7 +41,7 @@ class Db
         $stmt = self::adapter()->prepare('SELECT `size` FROM `cache` WHERE `hash` = :hash AND `expires` >= :expires');
 
         $stmt->execute([
-            'hash' => sha1($path),
+            'hash'    => sha1($path),
             'expires' => time(),
         ]);
 
@@ -79,6 +79,7 @@ SQL;
         $files = [];
 
         foreach (Db::adapter()->fetchAssoc($sql) as $row) {
+            $row['filename'] = basename($row['path']);
             $files[$row['id']] = $row;
         }
 
