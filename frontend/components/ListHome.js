@@ -1,11 +1,27 @@
 // Copyright 1999-2018. Plesk International GmbH. All rights reserved.
 
-import {createElement, Component, PropTypes, Translate, Toaster, Tabs, Tab, Button, List, Dialog, Icon, Paragraph, Section, FormFieldCheckbox, FormFieldText, ContentLoader} from '@plesk/ui-library';
+import {
+    Button,
+    createElement,
+    Component,
+    ContentLoader,
+    Dialog,
+    Icon,
+    FormFieldCheckbox,
+    FormFieldText,
+    List,
+    Paragraph,
+    Section,
+    Tab,
+    Tabs,
+    Toaster,
+    Translate,
+} from '@plesk/ui-library';
+
 import axios from 'axios';
 
 class ListHome extends Component {
-    constructor(props)
-    {
+    constructor(props) {
         super(props);
 
         this.state = {
@@ -45,24 +61,30 @@ class ListHome extends Component {
         this.listBiggestFiles();
     }
 
+    componentDidMount() {
+        Object.keys(this.state.listData).forEach(key => (
+            this.getSizeDynamically(key)
+        ));
+    }
+
     listColumn = () => {
         this.listColumns = [
             {
                 key: 'col1',
-                title: <Translate content="listName"/>,
+                title: <Translate content="listName" />,
                 width: '50%',
             },
             {
                 key: 'col2',
-                title: <Translate content="listType"/>,
+                title: <Translate content="listType" />,
             },
             {
                 key: 'col3',
-                title: <Translate content="listSize"/>,
+                title: <Translate content="listSize" />,
                 width: '10%',
             },
         ];
-    };
+    }
 
     listDataOnLoad = () => {
         Object.keys(this.state.list).map(key => (
@@ -74,10 +96,10 @@ class ListHome extends Component {
                 col3: this.formatBytes(this.state.list[key].size, true),
             }
         ));
-    };
+    }
 
     listData = () => {
-        let listData = [];
+        const listData = [];
 
         Object.keys(this.state.list).map(key => (
             listData[key] = {
@@ -89,37 +111,33 @@ class ListHome extends Component {
             }
         ));
 
-        this.setState({
-            listData: listData,
-        })
-    };
+        this.setState({ listData });
+    }
 
     listColumnBiggestFiles = () => {
         this.listColumnsBiggestFiles = [
             {
                 key: 'col1',
-                title: <Translate content="listBiggestFileName"/>,
+                title: <Translate content="listBiggestFileName" />,
             }, {
                 key: 'col2',
-                title: <Translate content="listBiggestFilePath"/>,
+                title: <Translate content="listBiggestFilePath" />,
             }, {
                 key: 'col3',
-                title: <Translate content="listBiggestFileSize"/>,
+                title: <Translate content="listBiggestFileSize" />,
                 width: '10%',
             },
         ];
-    };
+    }
 
     listBiggestFiles = () => {
-        axios.get(this.getBiggestFilesLink)
-            .then((response) => {
-                if(response.data.success === true)
-                {
+        axios
+            .get(this.getBiggestFilesLink)
+            .then(response => {
+                if (response.data.success === true) {
                     this.listDataBiggestFiles = [];
                     this.biggestFiles = response.data.data;
                     this.createListDataBiggestFiles();
-
-                    console.log(JSON.stringify(this.listDataBiggestFiles));
 
                     this.setState({
                         biggestFiles: response.data.data,
@@ -128,10 +146,10 @@ class ListHome extends Component {
                     });
                 }
             })
-            .catch((error) => {
+            .catch(error => {
                 this.toaster.add({
                     intent: 'danger',
-                    message: this.messageErrorTranslate(error)
+                    message: this.messageErrorTranslate(error),
                 });
             });
     };
@@ -144,119 +162,100 @@ class ListHome extends Component {
                 col2: this.biggestFiles[key].path,
                 col3: this.formatBytes(this.biggestFiles[key].size, true),
             }
-        ))
-    };
+        ));
+    }
 
-    formatListButton = (key) => {
-        if(this.state.list[key].isDir === true)
-        {
+    formatListButton = key => {
+        if (this.state.list[key].isDir === true) {
             return (
                 <span className="cursor-pointer" onClick={() => this.getItems(this.state.list[key].path)}>
-                    <Icon name="folder-open" size="16"/>{' '}{this.state.list[key].displayName}
+                    <Icon name="folder-open" size="16" />{' '}{this.state.list[key].displayName}
                 </span>
-            )
+            );
         }
 
         return (
             <span>
-                <Icon name="site-page" size="16"/>{' '}{this.state.list[key].displayName}
+                <Icon name="site-page" size="16" />{' '}{this.state.list[key].displayName}
             </span>
-        )
+        );
     };
 
     formatBytes = (bytes, initialLoad) => {
-        if(bytes === 0)
-        {
-            if(initialLoad)
-            {
+        if (bytes === 0) {
+            if (initialLoad) {
                 return (
                     <div className="lds-spinner">
-                        <div></div>
-                        <div></div>
-                        <div></div>
-                        <div></div>
-                        <div></div>
-                        <div></div>
-                        <div></div>
-                        <div></div>
-                        <div></div>
-                        <div></div>
-                        <div></div>
-                        <div></div>
+                        <div />
+                        <div />
+                        <div />
+                        <div />
+                        <div />
+                        <div />
+                        <div />
+                        <div />
+                        <div />
+                        <div />
+                        <div />
+                        <div />
                     </div>
-                )
+                );
             }
 
             return (
-                <div>0 B</div>
-            )
+                <div>{'0 B'}</div>
+            );
         }
 
-        var k = 1024;
-        var sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-        var i = Math.floor(Math.log(bytes) / Math.log(k));
+        const k = 1024;
+        const sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        const displayNum = parseFloat((bytes / Math.pow(k, i)).toFixed(2));
 
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-    };
-
-    componentDidMount()
-    {
-        Object.keys(this.state.listData).forEach(key => (
-            this.getSizeDynamically(key)
-        ));
+        return `${displayNum} ${sizes[i]}`;
     }
 
-    getSizeDynamically = (key) => {
+    getSizeDynamically = key => {
         const listEntry = this.state.listData[key].listKey;
 
-        if(this.state.list[listEntry].size === 0)
-        {
-            axios.get(this.getSizeLink + this.state.list[listEntry].path)
-                .then((response) => {
-                    if(response.status === 200)
-                    {
-                        const listData = this.state.listData;
+        if (this.state.list[listEntry].size === 0) {
+            axios
+                .get(this.getSizeLink + this.state.list[listEntry].path)
+                .then(response => {
+                    if (response.status === 200) {
+                        const { listData } = this.state;
                         listData[key].col3 = this.formatBytes(response.data, false);
 
-                        this.setState({
-                            listData: listData,
-                        });
+                        this.setState({ listData });
                     }
-                })
-                .catch((error) => {
                 });
         }
     };
 
-    getFileType = (isDir) => {
-        if(isDir === true)
-        {
+    getFileType = isDir => {
+        if (isDir === true) {
             return (
-                <Translate content="isDir"/>
-            )
+                <Translate content="isDir" />
+            );
         }
 
         return (
-            <Translate content="isFile"/>
-        )
+            <Translate content="isFile" />
+        );
     };
 
-    cleanUp = (values) => {
-        this.setState({
-            cleanUpButtonLoading: 'loading',
-        });
+    cleanUp = values => {
+        this.setState({ cleanUpButtonLoading: 'loading' });
 
-        axios.get(this.autoCleanUp + JSON.stringify(values))
-            .then((response) => {
-                if(response.data.success === true)
-                {
+        axios
+            .get(this.autoCleanUp + JSON.stringify(values))
+            .then(response => {
+                if (response.data.success === true) {
                     this.toaster.add({
                         intent: 'success',
                         message: response.data.message,
                     });
-                }
-                else
-                {
+                } else {
                     this.toaster.add({
                         intent: 'warning',
                         message: response.data.message,
@@ -267,35 +266,29 @@ class ListHome extends Component {
                     this.toaster.clear();
                 }, 10000);
 
-                this.setState({
-                    cleanUpButtonLoading: '',
-                });
-            })
-            .catch((error) => {
+                this.setState({ cleanUpButtonLoading: '' });
             });
     };
 
     delete = () => {
-        let selectedIds = this.state.selection;
+        const selectedIds = this.state.selection;
 
         this.setState({
             deleteButtonLoading: 'loading',
             selection: [],
         });
 
-        axios.post(this.deleteLink, {
+        axios
+            .post(this.deleteLink, {
                 paths: selectedIds,
             })
-            .then((response) => {
-                if(response.data.success === true)
-                {
+            .then(response => {
+                if (response.data.success === true) {
                     this.toaster.add({
                         intent: 'success',
                         message: response.data.message,
                     });
-                }
-                else
-                {
+                } else {
                     this.toaster.add({
                         intent: 'warning',
                         message: response.data.message,
@@ -308,22 +301,18 @@ class ListHome extends Component {
 
                 this.getItems(this.state.path);
 
-                this.setState({
-                    deleteButtonLoading: '',
-                });
-            })
-            .catch((error) => {
+                this.setState({ deleteButtonLoading: '' });
             });
-    };
+    }
 
-    getItems = (path) => {
-        axios.get(this.getItemsLink + path)
-            .then((response) => {
-                if(response.status === 200)
-                {
+    getItems = path => {
+        axios
+            .get(this.getItemsLink + path)
+            .then(response => {
+                if (response.status === 200) {
                     this.setState({
                         list: response.data,
-                        path: path,
+                        path,
                     });
 
                     this.listData();
@@ -333,166 +322,153 @@ class ListHome extends Component {
                         this.getSizeDynamically(key)
                     ));
                 }
-            })
-            .catch((error) => {
             });
-    };
+    }
 
-    getBreadcrumbs = (path) => {
-        axios.get(this.getBreadcrumbsPathLink + path)
-            .then((response) => {
-                if(response.status === 200)
-                {
-                    this.setState({
-                        breadcrumbsPath: response.data,
-                    });
+    getBreadcrumbs = path => {
+        axios
+            .get(this.getBreadcrumbsPathLink + path)
+            .then(response => {
+                if (response.status === 200) {
+                    this.setState({ breadcrumbsPath: response.data });
                 }
-            })
-            .catch((error) => {
             });
-    };
+    }
 
-    addBreadcrumbs = () => {
-        return (
-            <div id="pathbar-diskspace-usage-viewer" className="breadcrumbs pathbar clearfix">
-                <ul id="pathbar-content-area">
-                    {this.state.breadcrumbsPath.map(({name, path}) => (
-                        <li className="cursor-pointer">
+    addBreadcrumbs = () => (
+        <div id="pathbar-diskspace-usage-viewer" className="breadcrumbs pathbar clearfix">
+            <ul id="pathbar-content-area">
+                {this.state.breadcrumbsPath.map(({ name, path }) => (
+                    <li key={name} className="cursor-pointer">
                         <span onClick={() => this.getItems(path)}>
                             {name}
-                        </span><b>&gt;</b>
-                        </li>
-                    ))}
-                </ul>
-            </div>
-        )
-    };
+                        </span>
+                    </li>
+                ))}
+            </ul>
+        </div>
+    )
 
-    addDeleteButton()
-    {
+    addDeleteButton() {
         return (
             <Button
                 intent="primary"
-                onClick={() => this.setState({
-                    showDeleteDialog: true
-                })}
+                onClick={() => this.setState({ showDeleteDialog: true })}
                 state={this.state.deleteButtonLoading}
                 // TODO Add disabled state
             >
-                <Translate content="actionButtonDelete"/>
+                <Translate content="actionButtonDelete" />
             </Button>
-        )
-    };
+        );
+    }
 
-    addBiggestFilesDeleteButton()
-    {
+    addBiggestFilesDeleteButton() {
         return (
             <div>
                 <Button
                     intent="primary"
                     onClick={() => this.setState({
-                        showBiggestFilesRefreshDialog: true
+                        showBiggestFilesRefreshDialog: true,
                         // TODO Add dialog or start long task directly
                     })}
                     state={this.state.refreshButtonBiggestFilesLoading}
                 >
-                    <Translate content="actionButtonRefresh"/>
+                    <Translate content="actionButtonRefresh" />
                 </Button>{' '}
                 <Button
                     intent="primary"
                     onClick={() => this.setState({
-                        showBiggestFilesDeleteDialog: true
+                        showBiggestFilesDeleteDialog: true,
                         // TODO Add dialog
                     })}
                     state={this.state.deleteButtonBiggestFilesLoading}
                     // TODO Add disabled state
                 >
-                    <Translate content="actionButtonDelete"/>
+                    <Translate content="actionButtonDelete" />
                 </Button>
             </div>
-        )
-    };
+        );
+    }
 
-    addCleanUpButton()
-    {
+    addCleanUpButton() {
         return (
             <Button
                 intent="primary"
-                onClick={() => this.setState({
-                    showCleanUpDialog: true
-                })}
+                onClick={() => this.setState({ showCleanUpDialog: true })}
                 state={this.state.cleanUpButtonLoading}
             >
-                <Translate content="actionButtonCleanUp"/>
+                <Translate content="actionButtonCleanUp" />
             </Button>
-        )
-    };
+        );
+    }
 
-    addDialogScreens()
-    {
+    addDialogScreens() {
         return (
             <div>
                 <Dialog
                     isOpen={this.state.showCleanUpDialog === true}
-                    onClose={() => this.setState({showCleanUpDialog: false})}
-                    title={<Translate content="dialogCleanUpTitle"/>}
+                    onClose={() => this.setState({ showCleanUpDialog: false })}
+                    title={<Translate content="dialogCleanUpTitle" />}
                     size="sm"
                     form={{
-                        onSubmit: (values) => {
-                            this.setState({showCleanUpDialog: false});
+                        onSubmit: values => {
+                            this.setState({ showCleanUpDialog: false });
                             this.cleanUp(values);
                         },
-                        submitButton: {children: <span><Icon name="remove" size="16"/>{' '}{<Translate content="dialogCleanUpButton"/>}</span>},
+                        submitButton: { children: <span><Icon name="remove" size="16" />{' '}{<Translate content="dialogCleanUpButton" />}</span> },
                         values: {
                             cleanUpSelectionCache: true,
                             cleanUpSelectionBackup: true,
                             cleanUpBackupDays: 90,
-                        }
+                        },
                     }}
                 >
                     <Paragraph>
-                        <Translate content="dialogCleanUpDescription"/>
+                        <Translate content="dialogCleanUpDescription" />
                     </Paragraph>
-                    <Section title={<Translate content="dialogCleanUpSettingsTitle"/>}>
+                    <Section title={<Translate content="dialogCleanUpSettingsTitle" />}>
                         <FormFieldCheckbox
-                            label={<Translate content="dialogCleanUpSettingsCache"/>}
+                            label={<Translate content="dialogCleanUpSettingsCache" />}
                             name="cleanUpSelectionCache"
                         />
                         <FormFieldCheckbox
-                            label={<Translate content="dialogCleanUpSettingsBackup"/>}
+                            label={<Translate content="dialogCleanUpSettingsBackup" />}
                             name="cleanUpSelectionBackup"
                         />
                         <FormFieldText
                             name="cleanUpBackupDays"
-                            label={<Translate content="dialogCleanUpSettingsBackupDays"/>}
+                            label={<Translate content="dialogCleanUpSettingsBackupDays" />}
                         />
                     </Section>
                 </Dialog>
                 <Dialog
                     isOpen={this.state.showDeleteDialog === true}
-                    onClose={() => this.setState({showDeleteDialog: false})}
-                    title={<Translate content="dialogDeleteTitle"/>}
+                    onClose={() => this.setState({ showDeleteDialog: false })}
+                    title={<Translate content="dialogDeleteTitle" />}
                     size="sm"
                     buttons={
-                        <Button onClick={() => {
-                            this.setState({showDeleteDialog: false});
-                            this.delete();
-                        }} intent="warning">
-                            <Icon name="remove" size="16"/>{' '}{<Translate content="dialogDeleteButton"/>}
-                        </Button>}
+                        <Button
+                            intent="warning"
+                            onClick={() => {
+                                this.setState({ showDeleteDialog: false });
+                                this.delete();
+                            }}
+                        >
+                            <Icon name="remove" size="16" />{' '}{<Translate content="dialogDeleteButton" />}
+                        </Button>
+                    }
                 >
-                    {<Translate content="dialogDeleteDescription"/>}
+                    {<Translate content="dialogDeleteDescription" />}
                 </Dialog>
             </div>
-        )
-    };
+        );
+    }
 
     showBiggestFilesList = () => {
-        if(this.state.biggestFilesLoader === true)
-        {
+        if (this.state.biggestFilesLoader === true) {
             return (
-                <ContentLoader/>
-            )
+                <ContentLoader />
+            );
         }
 
         return (
@@ -500,27 +476,25 @@ class ListHome extends Component {
                 columns={this.listColumnsBiggestFiles}
                 data={this.state.listDataBiggestFiles}
                 selection={this.state.selectionBiggestFiles}
-                onSelectionChange={selection => this.setState({selection})}
+                onSelectionChange={selection => this.setState({ selection })}
             />
-        )
-    };
+        );
+    }
 
-    messageErrorTranslate(error)
-    {
+    messageErrorTranslate(error) {
         return (
             <span>
-                <Translate content='requestMessageError'/>{' '}
+                <Translate content="requestMessageError" />{' '}
                 {error}
             </span>
         );
-    };
+    }
 
-    render()
-    {
+    render() {
         return (
             <Tabs>
-                <Tab title={<Translate content='overviewTabMain'/>}>
-                    <Toaster ref={ref => (this.toaster = ref)}/>
+                <Tab title={<Translate content="overviewTabMain" />}>
+                    <Toaster ref={ref => (this.toaster = ref)} />
                     {this.addDialogScreens()}
                     {this.addCleanUpButton()}{' '}
                     {this.addDeleteButton()}
@@ -530,15 +504,15 @@ class ListHome extends Component {
                         data={this.state.listData}
                         sortColumn="col1"
                         selection={this.state.selection}
-                        onSelectionChange={selection => this.setState({selection})}
+                        onSelectionChange={selection => this.setState({ selection })}
                     />
                 </Tab>
-                <Tab title={<Translate content='overviewTabBiggestFiles'/>}>
+                <Tab title={<Translate content="overviewTabBiggestFiles" />}>
                     {this.addBiggestFilesDeleteButton()}
                     {this.showBiggestFilesList()}
                 </Tab>
             </Tabs>
-        )
+        );
     }
 }
 
