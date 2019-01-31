@@ -11,6 +11,7 @@ import {
     FormFieldText,
     List,
     Paragraph,
+    PropTypes,
     Section,
     Tab,
     Tabs,
@@ -515,5 +516,11 @@ class ListHome extends Component {
         );
     }
 }
+
+ListHome.propTypes = {
+    list: PropTypes.array.isRequired,
+    path: PropTypes.string.isRequired,
+    breadcrumbsPath: PropTypes.array.isRequired,
+};
 
 export default ListHome;

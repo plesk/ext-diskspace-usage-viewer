@@ -3,6 +3,7 @@
 import {
     createElement,
     LocaleProvider,
+    PropTypes,
 } from '@plesk/ui-library';
 
 import Home from '../containers/Home/Home';
@@ -19,6 +20,10 @@ const Action = ({ action, ...props }) => {
         default:
             return <Home {...props} />;
     }
+};
+
+App.propTypes = {
+    locales: PropTypes.array.isRequired,
 };
 
 export default App;
