@@ -28,12 +28,8 @@ class ListHome extends Component {
         this.state = {
             list: this.props.list,
             listData: [],
-            loading: false,
             showCleanUpDialog: false,
             showDeleteDialog: false,
-            showBiggestFilesDeleteDialog: false,
-            showBiggestFilesRefreshDialog: false,
-            toaster: [],
             cleanUpButtonLoading: '',
             deleteButtonLoading: '',
             deleteButtonBiggestFilesLoading: '',
@@ -41,8 +37,6 @@ class ListHome extends Component {
             selection: [],
             path: this.props.path,
             breadcrumbsPath: this.props.breadcrumbsPath,
-            listColumnsBiggestFiles: [],
-            biggestFiles: [],
             biggestFilesLoader: true,
             selectionBiggestFiles: [],
         };
@@ -141,7 +135,6 @@ class ListHome extends Component {
                     this.createListDataBiggestFiles();
 
                     this.setState({
-                        biggestFiles: response.data.data,
                         biggestFilesLoader: false,
                         listDataBiggestFiles: this.listDataBiggestFiles,
                     });
@@ -368,22 +361,16 @@ class ListHome extends Component {
             <div>
                 <Button
                     intent="primary"
-                    onClick={() => this.setState({
-                        showBiggestFilesRefreshDialog: true,
-                        // TODO Add dialog or start long task directly
-                    })}
+                    onClick={() => this.setState({ /* TODO Add dialog or start long task directly */ })}
                     state={this.state.refreshButtonBiggestFilesLoading}
                 >
                     <Translate content="actionButtonRefresh" />
                 </Button>{' '}
                 <Button
                     intent="primary"
-                    onClick={() => this.setState({
-                        showBiggestFilesDeleteDialog: true,
-                        // TODO Add dialog
-                    })}
+                    onClick={() => this.setState({ /* TODO Add dialog */ })}
                     state={this.state.deleteButtonBiggestFilesLoading}
-                    // TODO Add disabled state
+                    /* TODO Add disabled state */
                 >
                     <Translate content="actionButtonDelete" />
                 </Button>
