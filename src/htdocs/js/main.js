@@ -7477,7 +7477,7 @@ eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n    value: true\n});
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-eval("\n\nvar _uiLibrary = __webpack_require__(/*! @plesk/ui-library */ \"@plesk/ui-library\");\n\nvar _App = __webpack_require__(/*! ./components/App */ \"./components/App.js\");\n\nvar _App2 = _interopRequireDefault(_App);\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\n// Copyright 1999-2018. Plesk International GmbH. All rights reserved.\n\nmodule.exports = function (container, props) {\n    (0, _uiLibrary.render)((0, _uiLibrary.createElement)(_App2.default, props), container);\n};\n\n//# sourceURL=webpack:///./main.js?");
+eval("\n\nvar _uiLibrary = __webpack_require__(/*! @plesk/ui-library */ \"@plesk/ui-library\");\n\nvar _App = __webpack_require__(/*! ./components/App */ \"./components/App.js\");\n\nvar _App2 = _interopRequireDefault(_App);\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\n// Copyright 1999-2019. Plesk International GmbH. All rights reserved.\n\nmodule.exports = function (container, props) {\n    (0, _uiLibrary.render)((0, _uiLibrary.createElement)(_App2.default, props), container);\n};\n\n//# sourceURL=webpack:///./main.js?");
 
 /***/ }),
 
