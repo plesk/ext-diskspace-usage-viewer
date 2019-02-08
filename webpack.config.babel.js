@@ -1,7 +1,7 @@
 import path from 'path';
 
 export default {
-    mode: 'development',
+    mode: 'production',
     context: path.resolve(__dirname, 'frontend'),
     entry: './main',
     output: {
