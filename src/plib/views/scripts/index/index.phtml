@@ -1,58 +1,21 @@
 <?php
-// Copyright 1999-2018. Plesk International GmbH. All rights reserved.
+// Copyright 1999-2019. Plesk International GmbH. All rights reserved.
 
-echo '<p>' . \pm_Locale::lmsg('pageDescription') . '</p>';
-
-if ($this->isEmptyDir) {
-    if (!$this->runningTask) {
-        echo '<p>' . htmlspecialchars(\pm_Locale::lmsg('messageEmptyDir')) . '</p>';
-    }
-} elseif ($this->dirSize > 0) {
-    echo '<p>' . \pm_Locale::lmsg('labelTotalDirectorySize', ['size' => \PleskExt\DiskspaceUsageViewer\Helper::formatSize($this->dirSize)]) . '</p>';
-    echo '<div id="piechart" style="width: 800px; height: 400px;"></div>';
-}
-
-echo $this->renderList($this->list);
-
+use PleskExt\DiskspaceUsageViewer\Cleaner;
 ?>
 
+<div id="ext-<?= \pm_Context::getModuleId() ?>-app"></div>
+
 <script>
-function extDiskspaceUsageViewerRefresh(path) {
-    new Ajax.Request('/modules/diskspace-usage-viewer/index.php/index/refresh?path=' + encodeURIComponent(path), {
-        method: 'post',
-        onSuccess: function (resp) {
-            Jsw.getComponent('asyncProgressBarWrapper').progressDialog(resp.responseJSON);
-        }
-    });
-}
-
-<?php if ($this->dirSize > 0): ?>
-google.charts.load('current', {'packages':['corechart']});
-
-google.charts.setOnLoadCallback(function () {
-    var data = new google.visualization.DataTable();
-
-    data.addColumn('string', 'Name');
-    data.addColumn('number', 'Size');
-    data.addColumn({type: 'string', role: 'tooltip'});
-
-    data.addRows(<?= json_encode($this->chartData); ?>);
-
-    var options = {
-        title: '',
-        is3D: true,
-        sliceVisibilityThreshold: 0
-    };
-
-    var chart = new google.visualization.PieChart(document.getElementById('piechart'));
-
-    chart.draw(data, options);
+require(['<?= \pm_Context::getBaseUrl() ?>js/main.js'], function(render) {
+    render(document.getElementById('ext-<?= \pm_Context::getModuleId() ?>-app'), <?= json_encode([
+        'action' => 'home',
+        'locales' => \pm_Locale::getSection('home'),
+        'isAdmin' => \pm_Session::getClient()->isAdmin(),
+        'defaultDaysToKeepBackups' => Cleaner::DEFAULT_DAYS_TO_KEEP_BACKUPS,
+        'openFiles' => $this->openFiles,
+        'transOthers' => \pm_Locale::lmsg('others'),
+    ]) ?>);
 });
-<?php endif ?>
 
-<?php if ($this->runningTask): ?>
-Jsw.onReady(function () {
-    Jsw.getComponent('asyncProgressBarWrapper').progressDialog(<?= json_encode($this->runningTask->toArray()) ?>);
-});
-<?php endif ?>
 </script>

@@ -1,12 +1,12 @@
 <?php
 // Copyright 1999-2019. Plesk International GmbH. All rights reserved.
 
-use PleskExt\DiskspaceUsageViewer\Helper;
+use PleskExt\DiskspaceUsageViewer\Files;
 
 try {
-    Helper::updateBiggestFiles();
+    Files::update();
 } catch (\Exception $e) {
-    \pm_Log::err($e->__toString());
+    \pm_Log::err($e);
 
     exit(1);
 }

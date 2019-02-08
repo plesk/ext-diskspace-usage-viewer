@@ -4,5 +4,8 @@
     "react": {
       "pragma": "createElement"
     }
+  },
+  "rules": {
+    "react/prop-types": 0
   }
 }

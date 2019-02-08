@@ -1,16 +1,16 @@
-// Copyright 1999-2018. Plesk International GmbH. All rights reserved.
+// Copyright 1999-2019. Plesk International GmbH. All rights reserved.
 
 import {
     createElement,
     Fragment,
 } from '@plesk/ui-library';
 
-import ListHome from '../../components/ListHome';
+import HomeView from '../../components/HomeView';
 
 const Home = ({ ...props }) => (
     <Fragment>
         <div id="diskspace-usage-viewer">
-            <ListHome {...props} />
+            <HomeView {...props} />
         </div>
     </Fragment>
 );

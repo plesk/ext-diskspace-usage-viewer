@@ -1,4 +1,10 @@
-import { render, createElement } from '@plesk/ui-library';
+// Copyright 1999-2018. Plesk International GmbH. All rights reserved.
+
+import {
+    render,
+    createElement,
+} from '@plesk/ui-library';
+
 import App from './components/App';
 
 module.exports = (container, props) => {

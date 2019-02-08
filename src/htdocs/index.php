@@ -1,6 +1,4 @@
 <?php
-// Copyright 1999-2018. Plesk International GmbH. All rights reserved.
+// Copyright 1999-2019. Plesk International GmbH. All rights reserved.
 
-$application = new \pm_Application;
-
-$application->run();
+(new \pm_Application)->run();
