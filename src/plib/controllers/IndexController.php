@@ -1,219 +1,205 @@
 <?php
-// Copyright 1999-2018. Plesk International GmbH. All rights reserved.
+// Copyright 1999-2019. Plesk International GmbH. All rights reserved.
 
+use PleskExt\DiskspaceUsageViewer\Cleaner;
+use PleskExt\DiskspaceUsageViewer\Controller;
+use PleskExt\DiskspaceUsageViewer\Files;
 use PleskExt\DiskspaceUsageViewer\Helper;
+use PleskExt\DiskspaceUsageViewer\Task\UpdateFiles as UpdateFilesTask;
 
-class IndexController extends pm_Controller_Action
+class IndexController extends Controller
 {
-    const MAX_PIE_CHART_SLICES = 10;
-
-    private $client;
-    private $fileManager;
-    private $currentPath = '/';
-    private $basePath = '/';
-
-    protected $_accessLevel = ['admin', 'reseller', 'client'];
-
-    public function init()
-    {
-        parent::init();
-
-        $this->client = pm_Session::getClient();
-
-        if ($this->_getParam('site_id')) {
-            $siteId = $this->_getParam('site_id');
-
-            if (!$this->client->hasAccessToDomain($siteId)) {
-                throw new pm_Exception('Access denied');
-            }
-
-            $this->fileManager = new pm_FileManager($siteId);
-            $this->basePath = pm_Domain::getByDomainId($siteId)->getDocumentRoot();
-
-            $this->setCurrentPath($this->basePath);
-        } elseif ($this->client->isAdmin()) {
-            $this->fileManager = new pm_ServerFileManager;
-
-            $this->setCurrentPath('/');
-        } else {
-            $this->fileManager = new pm_FileManager(pm_Session::getCurrentDomain()->getId());
-            $this->basePath = pm_Session::getCurrentDomain()->getHomePath();
-
-            $this->setCurrentPath($this->basePath);
-        }
-
-        $this->view->headLink()->appendStylesheet(pm_Context::getBaseUrl() . 'css/styles.css');
-
-        $this->view->headScript()->appendFile('https://www.gstatic.com/charts/loader.js');
-    }
-
     public function indexAction()
     {
-        if ($this->_getParam('path')) {
-            $this->setCurrentPath($this->_getParam('path'));
-        }
+        $openFiles = (bool) $this->getParam('openFiles', 0);
 
-        $usage = Helper::getDiskspaceUsage($this->currentPath);
-        $chartData = [];
+        $this->view->headLink()->appendStylesheet(pm_Context::getBaseUrl() . 'css/chart.css');
+        $this->view->headLink()->appendStylesheet(pm_Context::getBaseUrl() . 'css/loading.css');
 
-        if (count($usage) > self::MAX_PIE_CHART_SLICES)
-        {
-            $top = array_slice($usage, 0, self::MAX_PIE_CHART_SLICES);
-            $other = array_slice($usage, self::MAX_PIE_CHART_SLICES);
-
-            foreach ($top as $item) {
-                $chartData[] = [$item['displayName'], $item['size'], $item['displayName']];
-            }
-
-            $otherSize = 0;
-
-            foreach ($other as $item) {
-                $otherSize += $item['size'];
-            }
-
-            $label = pm_Locale::lmsg('labelOtherFilesAndDirectories');
-            $chartData[] = [$label, $otherSize, $label];
-        }
-        else
-        {
-            foreach ($usage as $item) {
-                $chartData[] = [$item['displayName'], $item['size'], $item['displayName']];
-            }
-        }
-
-        $runningTask = Helper::getRunningTask($this->currentPath);
-
-        if (!$runningTask && Helper::needUpdateCache($this->currentPath)) {
-            $runningTask = Helper::startTask($this->currentPath);
-        }
-
-        $dirSize = 0;
-
-        foreach ($usage as $item) {
-            $dirSize += $item['size'];
-        }
-
-        $this->view->pageTitle = $this->lmsg('pageTitle', ['path' => $this->getCurrentPathBreadcrumb()]);
-        $this->view->chartData = $chartData;
-        $this->view->list = $this->getUsageList($usage);
-        $this->view->path = $this->currentPath;
-        $this->view->runningTask = $runningTask;
-        $this->view->isEmptyDir = empty($usage);
-        $this->view->dirSize = $dirSize;
+        $this->view->openFiles = $openFiles;
     }
 
-    public function indexDataAction()
+    public function usageAction()
     {
-        if ($this->_getParam('path')) {
-            $this->setCurrentPath($this->_getParam('path'));
+        $dir = $this->dir();
+        $client = pm_Session::getClient();
+
+        if ($client->isAdmin()) {
+            $fileManager = new pm_ServerFileManager();
+        } else {
+            $fileManager = new pm_FileManager(pm_Session::getCurrentDomain()->getId());
         }
 
-        $usage = Helper::getDiskspaceUsage($this->currentPath);
-        $list = $this->getUsageList($usage);
+        $items = [];
 
-        $this->_helper->json($list->fetchData());
-    }
+        foreach ($fileManager->scanDir($dir, true) as $basename) {
+            $basename = urldecode($basename);
+            $path = rtrim($dir, '/') . '/' . $basename;
 
-    public function refreshAction()
-    {
-        if (!$this->_request->isPost()) {
-            throw new pm_Exception('Permission denied');
-        }
-
-        $task = Helper::startTask($this->_getParam('path'));
-
-        $this->_helper->json($task);
-    }
-
-    public function deleteSelectedAction()
-    {
-        if (!$this->_request->isPost()) {
-            throw new pm_Exception('Permission denied');
-        }
-
-        $paths = (array) $this->_getParam('ids');
-        $messages = [];
-
-        foreach ($paths as $path) {
-            $path = Helper::cleanPath($path);
-
-            if (Helper::isSystemFile($path)) {
-                $messages[] = pm_Locale::lmsg('messageCannotDeleteSystemFile', ['path' => $path]);
-
+            try {
+                $isDir = $fileManager->isDir($path);
+            }
+            catch (PleskUtilException $e) {
                 continue;
             }
 
+            $items[] = [
+                'name' => $basename,
+                'isDir' => $isDir,
+                'path' => $path,
+                'size' => 0,
+                'sizeLoading' => true,
+            ];
+        }
+
+        $this->ajax($items);
+    }
+
+    public function sizeAction()
+    {
+        $path = Helper::cleanPath($this->getParam('path', ''));
+
+        $this->ajax([
+            'size' => Helper::size($path),
+        ]);
+    }
+
+    public function batchSizeAction()
+    {
+        $json = $this->getParam('json');
+        $data = json_decode($json, true);
+
+        foreach ($data as $key => $value) {
+            $data[$key]['size'] = Helper::size($value['path']);
+        }
+
+        $this->ajax($data);
+    }
+
+    public function filesAction()
+    {
+        $this->requireAdmin();
+
+        $this->ajax(array_values(Files::all()));
+    }
+
+    public function updateFilesAction()
+    {
+        $this->requirePost();
+
+        $dir = $this->dir();
+        $task = new UpdateFilesTask();
+        $url = pm_Context::getBaseUrl() . '?openFiles=1#' . $dir;
+
+        $task->setParam('redirect', $url);
+
+        (new pm_LongTask_Manager())->start($task);
+
+        $this->ajax([]);
+    }
+
+    public function deleteByPathAction()
+    {
+        $this->requirePost();
+
+        $json = $this->getParam('json');
+        $paths = json_decode($json, true);
+        $errors = [];
+
+        foreach ($paths as $path) {
             try {
-                if (Helper::isDir($path, $this->fileManager)) {
-                    $this->fileManager->removeDirectory($path);
-                } else {
-                    $this->fileManager->removeFile($path);
+                Helper::delete($path);
+            } catch (Exception $e) {
+                pm_Log::err($e);
+
+                $errors[] = pm_Locale::lmsg('home.message.deleteFailed', ['path' => $path]);
+            }
+        }
+
+        $this->ajax($errors);
+    }
+
+    public function deleteByIdAction()
+    {
+        $this->requireAdmin();
+        $this->requirePost();
+
+        $json = $this->getParam('json');
+        $ids = json_decode($json, true);
+        $files = Files::all();
+        $errors = [];
+
+        foreach ($ids as $id) {
+            try {
+                if (!isset($files[$id])) {
+                    continue;
                 }
-            } catch (\PleskUtilException $e) {
-                $messages[] = pm_Locale::lmsg('messageDeleteInsufficientPermissions', ['path' => $path]);
+
+                $path = $files[$id]['path'];
+
+                Helper::delete($path);
+                Files::delete($id);
+            } catch (Exception $e) {
+                pm_Log::err($e);
+
+                $errors[] = pm_Locale::lmsg('home.message.deleteFailed', ['path' => $path]);
             }
         }
 
-        $parentPath = '/';
-
-        if (!empty($paths)) {
-            $path = trim(Helper::cleanPath($paths[0]), '/');
-
-            if ($path != '') {
-                $segments = explode('/', $path);
-
-                array_pop($segments);
-
-                if (count($segments) > 0) {
-                    $parentPath = '/' . implode('/', $segments);
-                }
-            }
-        }
-
-        unlink(Helper::getCacheFile($parentPath));
-
-        $this->_helper->json($messages);
+        $this->ajax($errors);
     }
 
-    private function setCurrentPath($path)
+    public function cleanupAction()
     {
-        $path = trim(Helper::cleanPath($path));
+        $this->requireAdmin();
+        $this->requirePost();
 
-        if (!$this->client->isAdmin()) {
-            if (substr($path, 0, strlen($this->basePath)) !== $this->basePath) {
-                $path = $this->basePath;
-            }
+        $cleanupCache = (bool) $this->getParam('cleanupCache');
+        $cleanupBackup = (bool) $this->getParam('cleanupBackup');
+        $cleanupBackupDays = (int) $this->getParam('cleanupBackupDays');
+
+        if ($cleanupBackupDays <= 0) {
+            $cleanupBackupDays = Cleaner::DEFAULT_DAYS_TO_KEEP_BACKUPS;
         }
 
-        if (!Helper::isDir($path, $this->fileManager)) {
-            $path = $this->basePath;
+        if ($cleanupCache) {
+            Cleaner::cleanCache();
         }
 
-        $this->currentPath = $path;
+        if ($cleanupBackup) {
+            Cleaner::cleanBackups($cleanupBackupDays);
+        }
+
+        $this->ajax([]);
     }
 
-    private function getCurrentPathBreadcrumb()
+    private function dir(): string
     {
-        $path = trim($this->currentPath, '/');
+        $domainId = (int) $this->getParam('site_id');
 
-        if ($path == '') {
-            return '<a href="' . Helper::getActionUrl('index', ['path' => '/']) . '">/</a>';
+        if ($domainId > 0) {
+            return pm_Domain::getByDomainId($domainId)->getHomePath();
         }
 
-        $names = explode('/', $path);
-        $breadcrumbs = ['<a href="' . Helper::getActionUrl('index', ['path' => '/']) . '">/</a>'];
-        $currentPath = '';
+        $dir = Helper::cleanPath($this->getParam('dir', ''));
 
-        foreach ($names as $name) {
-            $currentPath .= '/' . $name;
-            $breadcrumbs[] = '<a href="' . Helper::getActionUrl('index', ['path' => $currentPath]) . '">' . htmlspecialchars($name) . '</a> /';
+        if (pm_Session::getClient()->isAdmin()) {
+            return $dir;
         }
 
-        return '<b>' . implode(' ', $breadcrumbs) . '</b>';
-    }
+        $domain = pm_Session::getCurrentDomain();
+        $baseDir = $domain->getHomePath();
 
-    private function getUsageList(array $usage)
-    {
-        return new \PleskExt\DiskspaceUsageViewer\UsageList($this->view, $this->_request, $this->currentPath, $usage);
+        if (substr($dir, 0, strlen($baseDir)) !== $baseDir) {
+            return $baseDir;
+        }
+
+        $fileManager = new pm_FileManager($domain->getId());
+
+        if (!$fileManager->isDir($dir)) {
+            return $baseDir;
+        }
+
+        return $dir;
     }
 }

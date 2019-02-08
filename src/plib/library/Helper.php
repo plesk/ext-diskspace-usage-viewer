@@ -1,15 +1,12 @@
 <?php
-// Copyright 1999-2018. Plesk International GmbH. All rights reserved.
+// Copyright 1999-2019. Plesk International GmbH. All rights reserved.
 
 namespace PleskExt\DiskspaceUsageViewer;
 
-use PleskExt\DiskspaceUsageViewer\Task\Scan;
-
 class Helper
 {
-    const CACHE_LIFETIME = 3600;
-
     private static $systemFiles = [
+        // From safe-rm
         '/',
         '/bin',
         '/boot',
@@ -38,6 +35,7 @@ class Helper
         '/usr/src',
         '/var',
 
+        // Plesk-related
         '/opt/plesk',
         '/opt/psa',
         '/var/www/vhosts/*/httpdocs',
@@ -45,20 +43,9 @@ class Helper
         '/var/lib/psa/*',
     ];
 
-    public static function formatSize($kb)
+    public static function cleanPath(string $path): string
     {
-        if ($kb > 1048576) {
-            return round($kb / 1048576, 1) . ' GB';
-        } else if ($kb > 1024) {
-            return round($kb / 1024, 1) . ' MB';
-        } else {
-            return round($kb, 1) . ' KB';
-        }
-    }
-
-    public static function cleanPath($path)
-    {
-        $path = str_replace('\\', '/', $path);
+        $path = trim(str_replace('\\', '/', $path));
         $segments = explode('/', $path);
 
         $segments = array_filter($segments, function ($segment) {
@@ -72,145 +59,48 @@ class Helper
         return '/' . implode('/', $segments);
     }
 
-    public static function getCacheFile($path)
+    public static function size(string $path): int
     {
-        $cacheDir = \pm_Context::getVarDir() . 'cache';
+        $args = [$path];
 
-        if (!is_dir($cacheDir)) {
-            mkdir($cacheDir, 0700, true);
+        if (!\pm_Session::getClient()->isAdmin()) {
+            $args[] = \pm_Session::getCurrentDomain()->getSysUserLogin();
         }
 
-        return $cacheDir . DIRECTORY_SEPARATOR . sha1($path) . '.json';
-    }
+        $size = 0;
 
-    public static function getTaskIdFile($path)
-    {
-        return self::getCacheFile($path) . '.task';
-    }
+        try {
+            $result = \pm_ApiCli::callSbin('size.sh', $args, \pm_ApiCli::RESULT_EXCEPTION);
+            $output = trim($result['stdout']);
+            $pos = strpos($output, "\t");
 
-    public static function getDiskspaceUsage($path)
-    {
-        $cacheFile = self::getCacheFile($path);
-
-        if (!is_file($cacheFile)) {
-            return [];
-        }
-
-        return (array) json_decode(file_get_contents($cacheFile), true);
-    }
-
-    public static function needUpdateCache($path)
-    {
-        if (is_file(self::getTaskIdFile($path))) {
-            return false;
-        }
-
-        $cacheFile = self::getCacheFile($path);
-
-        if (!is_file($cacheFile)) {
-            return true;
-        }
-
-        $lastModified = filemtime($cacheFile);
-
-        if ((time() - $lastModified) >= self::CACHE_LIFETIME) {
-            return true;
-        }
-
-        return false;
-    }
-
-    public static function startTask($path)
-    {
-        $taskIdFile = self::getTaskIdFile($path);
-
-        if (is_file($taskIdFile)) {
-            return null;
-        }
-
-        $taskManager = new \pm_LongTask_Manager;
-        $task = new Scan;
-        $isAdmin = \pm_Session::getClient()->isAdmin();
-
-        $task->setParam('isAdmin', $isAdmin);
-
-        if (!$isAdmin) {
-            $task->setParam('username', \pm_Session::getCurrentDomain()->getSysUserLogin());
-            $task->setParam('domainId', \pm_Session::getCurrentDomain()->getId());
-        }
-
-        $task->setParam('path', $path);
-        $task->setParam('redirect', self::getActionUrl('index', ['path' => $path]));
-
-        $taskManager->start($task);
-
-        file_put_contents($taskIdFile, $task->getInstanceId());
-
-        return $task;
-    }
-
-    public static function getRunningTask($path)
-    {
-        $taskIdFile = self::getTaskIdFile($path);
-
-        if (!is_file($taskIdFile)) {
-            return null;
-        }
-
-        $instanceId = file_get_contents($taskIdFile);
-        $taskManager = new \pm_LongTask_Manager;
-        $tasks = $taskManager->getTasks(['task\scan']);
-
-        foreach ($tasks as $task) {
-            if ($task->getInstanceId() == $instanceId) {
-                return $task;
+            if ($pos !== false) {
+                $size = (int) substr($output, 0, $pos);
             }
         }
-    }
-
-    public static function getActionUrl($action, array $params = [])
-    {
-        $url = \pm_Context::getActionUrl('index', $action);
-
-        if (!empty($params)) {
-            $url .= '?' . http_build_query($params);
+        catch (\pm_Exception $e) {
+            \pm_Log::err($e);
         }
 
-        return $url;
+        return $size;
     }
 
-    /**
-     * @param string $path
-     * @return bool
-     */
-    public static function isDir($path, \pm_FileManager $fileManager)
+    public static function delete(string $path): void
     {
-        if (method_exists($fileManager, 'isDir')) {
-            return $fileManager->isDir($path);
+        if (self::isSystemFile($path)) {
+            throw new \pm_Exception('Cannot delete system file: ' . $path);
+        }
+
+        $fileManager = self::createFileManager();
+
+        if ($fileManager->isDir($path)) {
+            $fileManager->removeDirectory($path);
         } else {
-            return $fileManager->fileExists($path . '/');
+            $fileManager->removeFile($path);
         }
     }
 
-    /**
-     * @param string $path
-     * @param int $maxLen
-     * @return string
-     */
-    public static function truncatePath($path, $maxLen)
-    {
-        if (mb_strlen($path) < $maxLen) {
-            return $path;
-        }
-
-        return '...' . mb_substr($path, -$maxLen);
-    }
-
-    /**
-     * @param string $path
-     * @return bool
-     */
-    public static function isSystemFile($path)
+    private static function isSystemFile(string $path): bool
     {
         foreach (self::$systemFiles as $systemFile) {
             if (fnmatch($systemFile, $path)) {
@@ -221,38 +111,12 @@ class Helper
         return false;
     }
 
-    /**
-     * @return array
-     */
-    public static function updateBiggestFiles()
+    private static function createFileManager(): \pm_FileManager
     {
-        try {
-            $result = \pm_ApiCli::callSbin('biggest_files.sh', [], \pm_ApiCli::RESULT_EXCEPTION);
-            $lines = explode("\n", $result['stdout']);
-            $files = [];
-
-            foreach ($lines as $line) {
-                $line = trim($line);
-
-                if ($line === '') {
-                    continue;
-                }
-
-                $pos = strpos($line, "\t");
-
-                if ($pos === false) {
-                    continue;
-                }
-
-                $files[] = [
-                    'size' => (int) substr($line, 0, $pos),
-                    'path' => substr($line, $pos + 1),
-                ];
-            }
-
-            Db::saveFiles(array_reverse($files));
-        } catch (\pm_Exception $e) {
-            \pm_Log::err($e->getMessage());
+        if (\pm_Session::getClient()->isAdmin()) {
+            return new \pm_ServerFileManager;
         }
+
+        return new \pm_FileManager(\pm_Session::getCurrentDomain()->getId());
     }
 }

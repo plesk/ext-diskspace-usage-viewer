@@ -1,11 +1,16 @@
-/* eslint-disable react/jsx-max-depth */
+// Copyright 1999-2019. Plesk International GmbH. All rights reserved.
 
-import {createElement, Fragment} from '@plesk/ui-library';
+import {
+    createElement,
+    Fragment,
+} from '@plesk/ui-library';
 
-const Home = ({...props}) => (
+import HomeView from '../../components/HomeView';
+
+const Home = ({ ...props }) => (
     <Fragment>
         <div id="diskspace-usage-viewer">
-            /* TODO: Add content */
+            <HomeView {...props} />
         </div>
     </Fragment>
 );

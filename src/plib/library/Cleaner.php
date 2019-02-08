@@ -1,10 +1,12 @@
 <?php
-// Copyright 1999-2018. Plesk International GmbH. All rights reserved.
+// Copyright 1999-2019. Plesk International GmbH. All rights reserved.
 
 namespace PleskExt\DiskspaceUsageViewer;
 
 class Cleaner
 {
+    public const DEFAULT_DAYS_TO_KEEP_BACKUPS = 90;
+
     public static function cleanCache(): void
     {
         \pm_ApiCli::callSbin('repair_diskspace', ['--repair'], \pm_ApiCli::RESULT_EXCEPTION);
