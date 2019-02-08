@@ -26,11 +26,7 @@ class Files
 
     public static function all(): array
     {
-        $sql = <<<SQL
-SELECT *
-FROM `files`
-ORDER BY `size` DESC
-SQL;
+        $sql = 'SELECT * FROM `files` ORDER BY `size` DESC';
 
         $files = [];
 
