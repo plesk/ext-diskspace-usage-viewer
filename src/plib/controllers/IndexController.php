@@ -13,8 +13,8 @@ class IndexController extends Controller
     {
         $openFiles = (bool) $this->getParam('openFiles', 0);
 
-        $this->view->headLink()->appendStylesheet(\pm_Context::getBaseUrl() . 'css/chart.css');
-        $this->view->headLink()->appendStylesheet(\pm_Context::getBaseUrl() . 'css/loading.css');
+        $this->view->headLink()->appendStylesheet(pm_Context::getBaseUrl() . 'css/chart.css');
+        $this->view->headLink()->appendStylesheet(pm_Context::getBaseUrl() . 'css/loading.css');
 
         $this->view->openFiles = $openFiles;
     }
@@ -22,12 +22,12 @@ class IndexController extends Controller
     public function usageAction()
     {
         $dir = $this->dir();
-        $client = \pm_Session::getClient();
+        $client = pm_Session::getClient();
 
         if ($client->isAdmin()) {
-            $fileManager = new \pm_ServerFileManager();
+            $fileManager = new pm_ServerFileManager();
         } else {
-            $fileManager = new \pm_FileManager(\pm_Session::getCurrentDomain()->getId());
+            $fileManager = new pm_FileManager(pm_Session::getCurrentDomain()->getId());
         }
 
         $items = [];
@@ -39,7 +39,7 @@ class IndexController extends Controller
             try {
                 $isDir = $fileManager->isDir($path);
             }
-            catch (\PleskUtilException $e) {
+            catch (PleskUtilException $e) {
                 continue;
             }
 
@@ -89,11 +89,11 @@ class IndexController extends Controller
 
         $dir = $this->dir();
         $task = new UpdateFilesTask();
-        $url = \pm_Context::getBaseUrl() . '?openFiles=1#' . $dir;
+        $url = pm_Context::getBaseUrl() . '?openFiles=1#' . $dir;
 
         $task->setParam('redirect', $url);
 
-        (new \pm_LongTask_Manager())->start($task);
+        (new pm_LongTask_Manager())->start($task);
 
         $this->ajax([]);
     }
@@ -109,10 +109,10 @@ class IndexController extends Controller
         foreach ($paths as $path) {
             try {
                 Helper::delete($path);
-            } catch (\Exception $e) {
-                \pm_Log::err($e);
+            } catch (Exception $e) {
+                pm_Log::err($e);
 
-                $errors[] = \pm_Locale::lmsg('home.message.deleteFailed', ['path' => $path]);
+                $errors[] = pm_Locale::lmsg('home.message.deleteFailed', ['path' => $path]);
             }
         }
 
@@ -139,10 +139,10 @@ class IndexController extends Controller
 
                 Helper::delete($path);
                 Files::delete($id);
-            } catch (\Exception $e) {
-                \pm_Log::err($e);
+            } catch (Exception $e) {
+                pm_Log::err($e);
 
-                $errors[] = \pm_Locale::lmsg('home.message.deleteFailed', ['path' => $path]);
+                $errors[] = pm_Locale::lmsg('home.message.deleteFailed', ['path' => $path]);
             }
         }
 
@@ -178,23 +178,23 @@ class IndexController extends Controller
         $domainId = (int) $this->getParam('site_id');
 
         if ($domainId > 0) {
-            return \pm_Domain::getByDomainId($domainId)->getHomePath();
+            return pm_Domain::getByDomainId($domainId)->getHomePath();
         }
 
         $dir = Helper::cleanPath($this->getParam('dir', ''));
 
-        if (\pm_Session::getClient()->isAdmin()) {
+        if (pm_Session::getClient()->isAdmin()) {
             return $dir;
         }
 
-        $domain = \pm_Session::getCurrentDomain();
+        $domain = pm_Session::getCurrentDomain();
         $baseDir = $domain->getHomePath();
 
         if (substr($dir, 0, strlen($baseDir)) !== $baseDir) {
             return $baseDir;
         }
 
-        $fileManager = new \pm_FileManager($domain->getId());
+        $fileManager = new pm_FileManager($domain->getId());
 
         if (!$fileManager->isDir($dir)) {
             return $baseDir;

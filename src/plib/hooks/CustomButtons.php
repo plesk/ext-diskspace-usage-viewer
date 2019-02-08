@@ -9,17 +9,17 @@ class Modules_DiskspaceUsageViewer_CustomButtons extends pm_Hook_CustomButtons
             [
                 'place' => self::PLACE_ADMIN_TOOLS_AND_SETTINGS,
                 'section' => self::SECTION_ADMIN_TOOLS_TOOLS_AND_RESOURCES,
-                'title' => \pm_Locale::lmsg('buttonHook.title'),
-                'description' => \pm_Locale::lmsg('buttonHook.description'),
-                'link' => \pm_Context::getBaseUrl(),
-                'icon' => \pm_Context::getBaseUrl() . 'img/32x32.png',
+                'title' => pm_Locale::lmsg('buttonHook.title'),
+                'description' => pm_Locale::lmsg('buttonHook.description'),
+                'link' => pm_Context::getBaseUrl(),
+                'icon' => pm_Context::getBaseUrl() . 'img/32x32.png',
             ],
             [
                 'place' => self::PLACE_DOMAIN_PROPERTIES,
-                'title' => \pm_Locale::lmsg('buttonHook.title'),
-                'description' => \pm_Locale::lmsg('buttonHook.description'),
-                'link' => \pm_Context::getBaseUrl(),
-                'icon' => \pm_Context::getBaseUrl() . 'img/32x32.png',
+                'title' => pm_Locale::lmsg('buttonHook.title'),
+                'description' => pm_Locale::lmsg('buttonHook.description'),
+                'link' => pm_Context::getBaseUrl(),
+                'icon' => pm_Context::getBaseUrl() . 'img/32x32.png',
                 'contextParams' => true,
                 'visibility' => [$this, 'isDomainPropertiesButtonVisible'],
             ],
@@ -36,6 +36,6 @@ class Modules_DiskspaceUsageViewer_CustomButtons extends pm_Hook_CustomButtons
             return false;
         }
 
-        return \pm_Domain::getByDomainId($params['site_id'])->hasHosting();
+        return pm_Domain::getByDomainId($params['site_id'])->hasHosting();
     }
 }

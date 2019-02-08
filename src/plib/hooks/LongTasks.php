@@ -3,7 +3,7 @@
 
 use PleskExt\DiskspaceUsageViewer\Task\UpdateFiles;
 
-class Modules_DiskspaceUsageViewer_LongTasks extends \pm_Hook_LongTasks
+class Modules_DiskspaceUsageViewer_LongTasks extends pm_Hook_LongTasks
 {
     public function getLongTasks()
     {
