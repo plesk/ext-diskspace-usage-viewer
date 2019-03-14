@@ -11,6 +11,14 @@ class IndexController extends Controller
 {
     public function indexAction()
     {
+        $domainId = (int) $this->getParam('site_id');
+
+        if ($domainId > 0) {
+            $url = pm_Context::getBaseUrl() . '#' . $this->dir();
+
+            $this->redirect($url);
+        }
+
         $openFiles = (bool) $this->getParam('openFiles', 0);
 
         $this->view->headLink()->appendStylesheet(pm_Context::getBaseUrl() . 'css/chart.css');
@@ -178,7 +186,7 @@ class IndexController extends Controller
         $domainId = (int) $this->getParam('site_id');
 
         if ($domainId > 0) {
-            return pm_Domain::getByDomainId($domainId)->getHomePath();
+            return pm_Domain::getByDomainId($domainId)->getDocumentRoot();
         }
 
         $dir = Helper::cleanPath($this->getParam('dir', ''));
