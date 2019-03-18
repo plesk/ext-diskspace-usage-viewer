@@ -84,7 +84,11 @@ class FileList extends Component {
                 dir: this.state.dir,
             }))
             .then(() => {
-                Jsw.getComponent('asyncProgressBarWrapper').update();
+                const progressWrapper = Jsw.getComponent('asyncProgressBarWrapper');
+
+                if (typeof progressWrapper !== 'undefined') {
+                    progressWrapper.update();
+                }
             })
             .catch(() => {
                 this.props.onError(<Translate content="message.requestFailed" />);
