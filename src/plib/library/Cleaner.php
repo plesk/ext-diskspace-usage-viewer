@@ -5,7 +5,10 @@ namespace PleskExt\DiskspaceUsageViewer;
 
 class Cleaner
 {
-    public const DEFAULT_DAYS_TO_KEEP_BACKUPS = 90;
+    public static function defaultDaysToKeepBackups(): int
+    {
+        return (int) \pm_Config::get('defaultDaysToKeepBackups');
+    }
 
     public static function cleanCache(): void
     {
