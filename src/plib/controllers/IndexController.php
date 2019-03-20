@@ -29,7 +29,7 @@ class IndexController extends Controller
         $this->view->locales = pm_Locale::getSection('home');
         $this->view->transOthers = pm_Locale::lmsg('others');
         $this->view->isAdmin = pm_Session::getClient()->isAdmin();
-        $this->view->defaultDaysToKeepBackups = Cleaner::DEFAULT_DAYS_TO_KEEP_BACKUPS;
+        $this->view->defaultDaysToKeepBackups = Cleaner::defaultDaysToKeepBackups();
         $this->view->openFiles = $openFiles;
     }
 
@@ -173,7 +173,7 @@ class IndexController extends Controller
         $cleanupBackupDays = (int) $this->getParam('cleanupBackupDays');
 
         if ($cleanupBackupDays <= 0) {
-            $cleanupBackupDays = Cleaner::DEFAULT_DAYS_TO_KEEP_BACKUPS;
+            $cleanupBackupDays = Cleaner::defaultDaysToKeepBackups();
         }
 
         if ($cleanupCache) {
