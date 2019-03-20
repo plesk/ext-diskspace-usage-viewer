@@ -64,7 +64,7 @@ class Helper
         $args = [$path];
 
         if (!\pm_Session::getClient()->isAdmin()) {
-            $args[] = \pm_Session::getCurrentDomain()->getSysUserLogin();
+            $args[] = self::activeDomain()->getSysUserLogin();
         }
 
         $size = 0;
@@ -100,6 +100,17 @@ class Helper
         }
     }
 
+    public static function activeDomain(): \pm_Domain
+    {
+        $domains = \pm_Session::getCurrentDomains();
+
+        reset($domains);
+
+        $key = key($domains);
+
+        return $domains[$key];
+    }
+
     private static function isSystemFile(string $path): bool
     {
         foreach (self::$systemFiles as $systemFile) {
@@ -117,6 +128,6 @@ class Helper
             return new \pm_ServerFileManager;
         }
 
-        return new \pm_FileManager(\pm_Session::getCurrentDomain()->getId());
+        return new \pm_FileManager(self::activeDomain()->getId());
     }
 }

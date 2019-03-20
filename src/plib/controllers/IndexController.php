@@ -35,7 +35,7 @@ class IndexController extends Controller
         if ($client->isAdmin()) {
             $fileManager = new pm_ServerFileManager();
         } else {
-            $fileManager = new pm_FileManager(pm_Session::getCurrentDomain()->getId());
+            $fileManager = new pm_FileManager(Helper::activeDomain()->getId());
         }
 
         $items = [];
@@ -195,7 +195,7 @@ class IndexController extends Controller
             return $dir;
         }
 
-        $domain = pm_Session::getCurrentDomain();
+        $domain = Helper::activeDomain();
         $baseDir = $domain->getHomePath();
 
         if (substr($dir, 0, strlen($baseDir)) !== $baseDir) {
