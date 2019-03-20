@@ -24,6 +24,12 @@ class IndexController extends Controller
         $this->view->headLink()->appendStylesheet(pm_Context::getBaseUrl() . 'css/chart.css');
         $this->view->headLink()->appendStylesheet(pm_Context::getBaseUrl() . 'css/loading.css');
 
+        $this->view->moduleId = pm_Context::getModuleId();
+        $this->view->baseUrl = pm_Context::getBaseUrl();
+        $this->view->locales = pm_Locale::getSection('home');
+        $this->view->transOthers = pm_Locale::lmsg('others');
+        $this->view->isAdmin = pm_Session::getClient()->isAdmin();
+        $this->view->defaultDaysToKeepBackups = Cleaner::DEFAULT_DAYS_TO_KEEP_BACKUPS;
         $this->view->openFiles = $openFiles;
     }
 

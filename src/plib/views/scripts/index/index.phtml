@@ -1,20 +1,18 @@
 <?php
 // Copyright 1999-2019. Plesk International GmbH. All rights reserved.
-
-use PleskExt\DiskspaceUsageViewer\Cleaner;
 ?>
 
-<div id="ext-<?= pm_Context::getModuleId() ?>-app"></div>
+<div id="ext-<?= $this->moduleId ?>-app"></div>
 
 <script>
-require(['<?= pm_Context::getBaseUrl() ?>js/main.js'], function(render) {
-    render(document.getElementById('ext-<?= pm_Context::getModuleId() ?>-app'), <?= json_encode([
+require(['<?= $this->baseUrl ?>js/main.js'], function(render) {
+    render(document.getElementById('ext-<?= $this->moduleId ?>-app'), <?= json_encode([
         'action' => 'home',
-        'locales' => pm_Locale::getSection('home'),
-        'isAdmin' => pm_Session::getClient()->isAdmin(),
-        'defaultDaysToKeepBackups' => Cleaner::DEFAULT_DAYS_TO_KEEP_BACKUPS,
+        'locales' => $this->locales,
+        'transOthers' => $this->transOthers,
+        'isAdmin' => $this->isAdmin,
+        'defaultDaysToKeepBackups' => $this->defaultDaysToKeepBackups,
         'openFiles' => $this->openFiles,
-        'transOthers' => pm_Locale::lmsg('others'),
     ]) ?>);
 });
 
