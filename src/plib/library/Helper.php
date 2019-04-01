@@ -79,7 +79,7 @@ class Helper
             }
         }
         catch (\pm_Exception $e) {
-            \pm_Log::err($e);
+            // Exception intentionally silenced
         }
 
         return $size;
