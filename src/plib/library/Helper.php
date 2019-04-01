@@ -63,7 +63,7 @@ class Helper
     {
         $args = [$path];
 
-        if (!\pm_Session::getClient()->isAdmin()) {
+        if (\pm_Session::getClient()->isClient()) {
             $args[] = self::activeDomain()->getSysUserLogin();
         }
 
