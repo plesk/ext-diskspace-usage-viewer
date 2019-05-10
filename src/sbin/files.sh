@@ -1,3 +1,3 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-find / -type f -print0 | xargs -0 du | sort -n | tail -50 | cut -f2 | xargs -I{} du -bs {}
+find / -path /proc -prune -o -path /sys -prune -o -type f -size +512k -printf '%s\t%p\n' | sort -n | tail -n 50
