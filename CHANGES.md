@@ -1,3 +1,7 @@
+# 2.0.1 (13 May 2019)
+
+* [*] Improved list building performance of largest files
+
 # 2.0.0 (8 January 2019)
 
 * [+] Completely new user interface
