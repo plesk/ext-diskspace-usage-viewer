@@ -65,7 +65,7 @@ class Helper
 
         if (\pm_Session::getClient()->isClient()) {
             $args[] = self::activeDomain()->getSysUserLogin();
-            $args[] = dirname($path);
+            $args[] = self::activeDomain()->getHomePath();
         }
 
         $size = 0;
