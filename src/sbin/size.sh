@@ -1,8 +1,8 @@
 #!/bin/bash -e
 
-if [ ! -z "$2" ]
+if [ ! -z "$3" ]
 then
-    plesk sbin filemng "$2" exec "$1" "$0" "$1"
+    plesk sbin filemng "$2" exec "$3" "$0" "$1"
     exit $?
 fi
 

@@ -65,6 +65,7 @@ class Helper
 
         if (\pm_Session::getClient()->isClient()) {
             $args[] = self::activeDomain()->getSysUserLogin();
+            $args[] = dirname($path);
         }
 
         $size = 0;
@@ -77,8 +78,7 @@ class Helper
             if ($pos !== false) {
                 $size = (int) substr($output, 0, $pos);
             }
-        }
-        catch (\pm_Exception $e) {
+        } catch (\pm_Exception $e) {
             // Exception intentionally silenced
         }
 
