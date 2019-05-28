@@ -11,4 +11,36 @@
   <url>https://www.plesk.com</url>
   <plesk_min_version>17.8.11</plesk_min_version>
   <os>unix</os>
+  <!--Localized descriptions below-->
+  <description xml:lang="ar">ابحث عن المجلدات ذات المساحة القرصية الأكثر استخدامًا وفرِّغ بعض المساحة بسهولة.</description>
+  <description xml:lang="ca-ES">Localitzi aquelles carpetes que consumeixen més espai en disc i alliberi espai fàcilment.</description>
+  <description xml:lang="cs-CZ">Najít složky s nejvíce využívaným místem na disku a snadno uvolnit nějaký prostor.</description>
+  <description xml:lang="da-DK">Find mapper med mest forbrugt diskplads og frigør nemt plads</description>
+  <description xml:lang="de-DE">Die größten Ordner erkennen und Speicherplatz ganz einfach freigeben.</description>
+  <description xml:lang="el-GR">Βρείτε τους φακέλους που χρησιμοποιούν τον περισσότερο χώρο και ελευθερώστε εύκολα χώρο στον δίσκο.</description>
+  <description xml:lang="es-ES">Descubra qué carpetas usan más espacio en disco y libere espacio en disco de forma sumamente fácil.</description>
+  <description xml:lang="fi-FI">Hae käytetyimmän levytilan omaavat kansiot ja vapauta helposti tilaa.</description>
+  <description xml:lang="fr-FR">Trouver les fichiers occupant le plus d'espace disque et libérer de l'espace.</description>
+  <description xml:lang="he-IL">אתר תיקיות עם השימוש הכי גבוה בשטח דיסק ופנה מקום בקלות.</description>
+  <description xml:lang="hu-HU">Keressen olyan mappákat, melyek a leggyakrabban használt lemezterülettel rendelkeznek és könnyű egy kevés terület felszabadítása.</description>
+  <description xml:lang="id-ID">Temukan folder dengan ruang disk yang paling banyak digunakan dan kosongkan sebagian ruang dengan mudah.</description>
+  <description xml:lang="it-IT">Trova le cartelle che utilizzano più spazio su disco e libera spazio facilmente.</description>
+  <description xml:lang="ja-JP">ディスクスペースが最も使用されているフォルダを探し、ディスクスペースの一部を簡単に解放します。</description>
+  <description xml:lang="ko-KR">가장 많이 사용된 디스크 공간을 찾고 일부 공간을 손쉽게 확보하십시오.</description>
+  <description xml:lang="ms-MY">Cari folder dengan ruang cakera yang paling banyak digunakan dan mengosongkan ruang dengan lebih mudah.</description>
+  <description xml:lang="nb-NO">Finn mapper med størst forbruk av diskplass og frigjør litt plass på en enkel måte.</description>
+  <description xml:lang="nl-NL">Zoek de mappen die de meeste schijfruimte gebruiken en maak eenvoudig extra ruimte vrij.</description>
+  <description xml:lang="pl-PL">Znajdź foldery z najbardziej wykorzystaną przestrzenią dyskową i łatwo zwolnij trochę miejsca.</description>
+  <description xml:lang="pt-BR">Encontre pastas mais utilizadas e consomem espaço em disco  e libere algum espaço facilmente</description>
+  <description xml:lang="pt-PT">Encontre pastas com o espaço em disco mais utilizado e liberte facilmente algum espaço.</description>
+  <description xml:lang="ro-RO">Găsiți folderele care ocupă cel mai mult loc pe disc și eliberați cu ușurință spațiu de stocare.</description>
+  <description xml:lang="ru-RU">Найдите папки, которые используют больше всего дискового пространства, и легко освободите место на диске.</description>
+  <description xml:lang="sv-SE">Hitta mappar med mest använt diskutrymme och enkelt frigöra lite utrymme.</description>
+  <description xml:lang="th-TH">ค้นหาโฟลเดอร์ที่ใช้เนื้อที่ดิสก์มากที่สุดและสามารถคืนเนื้อที่ว่างบางส่วนได้อย่างง่ายดาย</description>
+  <description xml:lang="tl-PH">Maghanap ng mga folder na may pinakamalaking ginagamit na espasyo sa disk at madaling magbakante ng espasyo.</description>
+  <description xml:lang="tr-TR">En fazla kullanılan disk alanı olan klasörleri bulun ve kolayca biraz alan açın.</description>
+  <description xml:lang="uk-UA">Знайдіть теки з найчастішим використанням дискового простору та легко звільніть місце</description>
+  <description xml:lang="vi-VN">Tìm những thư mục có dung lượng lưu trữ được sử dụng nhiều nhất và dễ dàng dọn dẹp tăng dung lượng lưu trữ.</description>
+  <description xml:lang="zh-CN">查找最常用磁盘空间的文件夹，并轻松释放一些空间。</description>
+  <description xml:lang="zh-TW">查找最常用磁碟空間的資料夾，並輕鬆釋放一些空間。</description>
 </module>
