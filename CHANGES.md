@@ -1,3 +1,7 @@
+# 2.0.2 (28 May 2019)
+
+[+] Added translations for all Plesk supported languages
+
 # 2.0.1 (13 May 2019)
 
 * [*] Improved list building performance of largest files
