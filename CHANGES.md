@@ -1,6 +1,10 @@
+# 2.0.3 (31 May 2019)
+
+* [*] Updated dependencies to fix CVE-2019-10742
+
 # 2.0.2 (28 May 2019)
 
-[+] Added translations for all Plesk supported languages
+* [+] Added translations for all Plesk supported languages
 
 # 2.0.1 (13 May 2019)
 
