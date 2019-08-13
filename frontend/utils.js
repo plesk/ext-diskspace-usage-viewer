@@ -17,6 +17,23 @@ export const formatBytes = bytes => {
     return `${Math.max(bytes, 0.1).toFixed(1)} ${units[i]}`;
 };
 
+export const formatTimestamp = stamp => {
+    if (stamp <= 0) {
+        return '';
+    }
+
+    const date = new Date(stamp * 1000);
+
+    return new Intl.DateTimeFormat('de-DE', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+    }).format(date);
+};
+
 export const postParams = params => {
     const result = new URLSearchParams();
 

@@ -11,6 +11,7 @@ import {
 
 import {
     formatBytes,
+    formatTimestamp,
     postParams,
     urlTo,
 } from '../utils';
@@ -41,7 +42,7 @@ class FileList extends Component {
             key: 'path',
             title: <Translate content="tab.files.col.path" />,
             sortable: true,
-            width: '70%',
+            width: '60%',
         }, {
             key: 'size',
             title: <Translate content="tab.files.col.size" />,
@@ -53,6 +54,16 @@ class FileList extends Component {
             render: row => (
                 <div style={{ textAlign: 'right' }}>
                     {formatBytes(row.size)}
+                </div>
+            ),
+        }, {
+            key: 'mtime',
+            title: <Translate content="tab.files.col.mtime" />,
+            sortable: true,
+            width: '10%',
+            render: row => (
+                <div>
+                    {formatTimestamp(row.mtime)}
                 </div>
             ),
         }];
@@ -156,6 +167,7 @@ class FileList extends Component {
                         name: item.name,
                         path: item.path,
                         size: item.size,
+                        mtime: item.mtime,
                     }))}
                     sortColumn="size"
                     sortDirection="DESC"

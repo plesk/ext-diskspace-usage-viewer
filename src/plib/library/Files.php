@@ -9,7 +9,7 @@ class Files
     {
         try {
             $files = self::scan();
-            $stmt = Db::adapter()->prepare('INSERT INTO `files` (`path`, `size`) VALUES (:path, :size)');
+            $stmt = Db::adapter()->prepare('INSERT INTO `files` (`path`, `size`, `mtime`) VALUES (:path, :size, :mtime)');
 
             Db::adapter()->exec('DELETE FROM `files`');
 
@@ -17,6 +17,7 @@ class Files
                 $stmt->execute([
                     'path' => $file['path'],
                     'size' => $file['size'],
+                    'mtime' => $file['mtime'],
                 ]);
             }
         } catch (\pm_Exception $e) {
@@ -27,7 +28,6 @@ class Files
     public static function all(): array
     {
         $sql = 'SELECT * FROM `files` ORDER BY `size` DESC';
-
         $files = [];
 
         foreach (Db::adapter()->fetchAssoc($sql) as $row) {
@@ -38,6 +38,7 @@ class Files
                 'name' => basename($row['path']),
                 'path' => $row['path'],
                 'size' => (int) $row['size'],
+                'mtime' => (int) $row['mtime'],
             ];
         }
 
@@ -66,15 +67,16 @@ class Files
                 continue;
             }
 
-            $pos = strpos($line, "\t");
+            $cols = explode("\t", $line);
 
-            if ($pos === false) {
+            if (count($cols) !== 3) {
                 continue;
             }
 
             $files[] = [
-                'size' => (int) substr($line, 0, $pos),
-                'path' => substr($line, $pos + 1),
+                'size' => (int) $cols[0],
+                'mtime' => strtotime($cols[1]),
+                'path' => $cols[2],
             ];
         }
 

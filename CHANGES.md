@@ -1,3 +1,7 @@
+# 2.0.4 (13 Aug 2019)
+
+* [+] Added "Last modified" column in Largest Files list
+
 # 2.0.3 (31 May 2019)
 
 * [*] Updated dependencies to fix CVE-2019-10742

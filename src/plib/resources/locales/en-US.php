@@ -45,6 +45,7 @@ $messages = [
                     'name' => 'Name',
                     'path' => 'Path',
                     'size' => 'Size',
+                    'mtime' => 'Last modified',
                 ],
                 'button' => [
                     'refresh' => 'Refresh',
