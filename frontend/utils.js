@@ -24,7 +24,7 @@ export const formatTimestamp = stamp => {
 
     const date = new Date(stamp * 1000);
 
-    return new Intl.DateTimeFormat('de-DE', {
+    return new Intl.DateTimeFormat('default', {
         year: 'numeric',
         month: '2-digit',
         day: '2-digit',
