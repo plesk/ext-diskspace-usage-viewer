@@ -5,20 +5,14 @@ namespace PleskExt\DiskspaceUsageViewer;
 
 class Installer
 {
-    private const INITIAL_VERSION = '0.0.0';
-
-    public static function install(): void
+    public static function upgrade(string $fromVersion): void
     {
-        $file = Db::path();
-
-        touch($file);
-        chmod($file, 0600);
-
-        self::upgrade(self::INITIAL_VERSION);
+        self::initDb();
+        self::migrate($fromVersion);
         self::addUpdateFilesTask();
     }
 
-    public static function upgrade(string $fromVersion): void
+    private static function migrate(string $fromVersion): void
     {
         $schemaDir = \pm_Context::getPlibDir() . 'resources/schemas';
         $allVersions = [];
@@ -34,7 +28,7 @@ class Installer
         usort($allVersions, 'version_compare');
 
         $versionFile = \pm_Context::getVarDir() . 'db.version';
-        $schemaVersion = self::INITIAL_VERSION;
+        $schemaVersion = null;
         $fileManager = new \pm_ServerFileManager();
 
         if (!is_file($versionFile)) {
@@ -49,8 +43,10 @@ class Installer
                 continue;
             }
 
-            if (version_compare($curVersion, $schemaVersion) !== 1) {
-                continue;
+            if ($schemaVersion !== null) {
+                if (version_compare($curVersion, $schemaVersion) !== 1) {
+                    continue;
+                }
             }
 
             $schemaFile = $schemaDir . '/' . $curVersion . '.sql';
@@ -71,12 +67,30 @@ class Installer
         }
     }
 
+    private static function initDb(): void
+    {
+        $file = Db::path();
+
+        if (!file_exists($file)) {
+            touch($file);
+            chmod($file, 0600);
+        }
+    }
+
     private static function addUpdateFilesTask(): void
     {
         $scheduler = \pm_Scheduler::getInstance();
+        $command = 'files.php';
+
+        foreach ($scheduler->listTasks() as $task) {
+            if ($task->getCmd() === $command) {
+                return;
+            }
+        }
+
         $task = new \pm_Scheduler_Task();
 
-        $task->setCmd('files.php');
+        $task->setCmd($command);
         $task->setSchedule(\pm_Scheduler::$EVERY_HOUR);
 
         $scheduler->putTask($task);
