@@ -5,14 +5,9 @@ use PleskExt\DiskspaceUsageViewer\Installer;
 
 try {
     $installType = $_SERVER['argv'][1] ?? 'install';
+    $fromVersion = ($installType === 'install') ? '0.0.0' : $_SERVER['argv'][2];
 
-    if ($installType === 'install') {
-        Installer::install();
-    } else {
-        $fromVersion = $_SERVER['argv'][2];
-
-        Installer::upgrade($fromVersion);
-    }
+    Installer::upgrade($fromVersion);
 } catch (Exception $e) {
     pm_Log::err($e);
 
