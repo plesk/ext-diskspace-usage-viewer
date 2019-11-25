@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-find / -path /proc -prune -o -path /sys -prune -o -type f -size +512k -printf '%s\t%Tc\t%p\n' | sort -n | tail -n 50
+find / -maxdepth 7 -path /proc -prune -o -path /sys -prune -o -type f -size +50M -printf '%s\t%Tc\t%p\n' | sort -n | tail -n 50
