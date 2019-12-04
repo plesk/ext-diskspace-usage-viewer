@@ -52,6 +52,7 @@ class IndexController extends Controller
 
             try {
                 $isDir = $fileManager->isDir($path);
+                $mtime = filemtime($path);
             }
             catch (PleskUtilException $e) {
                 continue;
@@ -61,6 +62,7 @@ class IndexController extends Controller
                 'name' => $basename,
                 'isDir' => $isDir,
                 'path' => $path,
+                'mtime' => $mtime,
                 'size' => 0,
                 'sizeLoading' => true,
             ];
