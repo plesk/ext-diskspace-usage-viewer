@@ -16,6 +16,7 @@ import {
 
 import {
     formatBytes,
+    formatTimestamp,
     postParams,
     urlTo,
 } from '../utils';
@@ -53,7 +54,7 @@ class UsageList extends Component {
             key: 'name',
             title: <Translate content="tab.usage.col.name" />,
             sortable: true,
-            width: '80%',
+            width: '70%',
             render: row => {
                 if (row.isDir) {
                     return (
@@ -98,6 +99,16 @@ class UsageList extends Component {
                     </div>
                 );
             },
+        }, {
+            key: 'mtime',
+            title: <Translate content="tab.files.col.mtime" />,
+            sortable: true,
+            width: '10%',
+            render: row => (
+                <div>
+                    {formatTimestamp(row.mtime)}
+                </div>
+            ),
         }];
 
         this.colors = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#B8B5E8', '#C0D5D9'];
@@ -462,6 +473,7 @@ class UsageList extends Component {
                         key: item.path,
                         name: item.name,
                         isDir: item.isDir,
+                        mtime: item.mtime,
                         size: item.size,
                         path: item.path,
                         itemKey: key,
