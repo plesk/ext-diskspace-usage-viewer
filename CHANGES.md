@@ -1,3 +1,7 @@
+# 2.0.6 (5 Dec 2019)
+
+* [+] Added "Last modified" column in Diskspace Usage tab
+
 # 2.0.5 (25 Nov 2019)
 
 * [*] Improved list building performance of largest files
