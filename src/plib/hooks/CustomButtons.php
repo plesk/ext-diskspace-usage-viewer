@@ -28,6 +28,10 @@ class Modules_DiskspaceUsageViewer_CustomButtons extends pm_Hook_CustomButtons
 
     public function isDomainPropertiesButtonVisible(array $params)
     {
+        if (!pm_Session::getClient()->hasCorePermission('filesManagement')) {
+            return false;
+        }
+
         if (isset($params['alias_id'])) {
             return false;
         }
