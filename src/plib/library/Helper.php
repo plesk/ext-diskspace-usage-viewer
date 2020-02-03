@@ -111,6 +111,11 @@ class Helper
         return $domains[$key];
     }
 
+    public static function canUserManageFiles(): bool
+    {
+        return \pm_Session::getClient()->hasCorePermission('filesManagement');
+    }
+
     private static function isSystemFile(string $path): bool
     {
         foreach (self::$systemFiles as $systemFile) {
