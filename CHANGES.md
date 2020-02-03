@@ -1,3 +1,7 @@
+# 2.0.7 (3 Feb 2020)
+
+* [*] Limit access to extension for users that do not have the "Upload and manage files" user role
+
 # 2.0.6 (5 Dec 2019)
 
 * [+] Added "Last modified" column in Diskspace Usage tab
