@@ -30,10 +30,6 @@ class Modules_DiskspaceUsageViewer_CustomButtons extends pm_Hook_CustomButtons
 
     public function isDomainPropertiesButtonVisible(array $params)
     {
-        if (!Helper::canUserManageFiles()) {
-            return false;
-        }
-
         if (isset($params['alias_id'])) {
             return false;
         }
@@ -42,6 +38,12 @@ class Modules_DiskspaceUsageViewer_CustomButtons extends pm_Hook_CustomButtons
             return false;
         }
 
-        return pm_Domain::getByDomainId($params['site_id'])->hasHosting();
+        $domain = pm_Domain::getByDomainId($params['site_id']);
+
+        if (!Helper::canUserManageFiles($domain)) {
+            return false;
+        }
+
+        return $domain->hasHosting();
     }
 }

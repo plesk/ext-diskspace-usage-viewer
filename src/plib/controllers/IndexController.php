@@ -9,13 +9,6 @@ use PleskExt\DiskspaceUsageViewer\Task\UpdateFiles as UpdateFilesTask;
 
 class IndexController extends Controller
 {
-    public function init()
-    {
-        if (!Helper::canUserManageFiles()) {
-            throw new \pm_Exception('Permission denied');
-        }
-    }
-
     public function indexAction()
     {
         $domainId = (int) $this->getParam('site_id');
@@ -201,7 +194,13 @@ class IndexController extends Controller
         $domainId = (int) $this->getParam('site_id');
 
         if ($domainId > 0) {
-            return pm_Domain::getByDomainId($domainId)->getDocumentRoot();
+            $pmDomain = pm_Domain::getByDomainId($domainId);
+
+            if (!Helper::canUserManageFiles($pmDomain)) {
+                throw new pm_Exception('Permission denied');
+            }
+
+            return $pmDomain->getDocumentRoot();
         }
 
         $dir = Helper::cleanPath($this->getParam('dir', ''));
