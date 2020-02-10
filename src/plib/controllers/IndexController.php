@@ -52,9 +52,12 @@ class IndexController extends Controller
 
             try {
                 $isDir = $fileManager->isDir($path);
-                $mtime = filemtime($path);
-            }
-            catch (PleskUtilException $e) {
+                $mtime = @filemtime($path);
+
+                if ($mtime === false) {
+                    $mtime = 0;
+                }
+            } catch (PleskUtilException $e) {
                 continue;
             }
 
