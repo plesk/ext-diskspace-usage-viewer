@@ -6,4 +6,4 @@ then
     exit $?
 fi
 
-du -bls "$1"
+du -ls "$1"
