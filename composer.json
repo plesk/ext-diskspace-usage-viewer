@@ -14,6 +14,6 @@
     }
   },
   "require-dev": {
-    "plesk/pm-api-stubs": "^17.0"
+    "plesk/pm-api-stubs": "^18.0"
   }
 }

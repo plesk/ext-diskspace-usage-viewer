@@ -11,3 +11,4 @@ yarn-error.log*
 
 # Generated assets
 /src/htdocs/js/main.js
+/src/htdocs/js/main.js.LICENSE.txt
