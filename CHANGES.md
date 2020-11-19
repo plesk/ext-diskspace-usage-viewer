@@ -1,3 +1,7 @@
+# 2.0.8 (19 Nov 2020)
+
+* [*] Calculate block size instead of apparent size (EXTCERT-3206)
+
 # 2.0.7 (3 Feb 2020)
 
 * [*] Limit access to extension for users that do not have the "Upload and manage files" user role
