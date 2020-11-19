@@ -5,6 +5,8 @@ namespace PleskExt\DiskspaceUsageViewer;
 
 class Helper
 {
+    private const POWER = 1024;
+
     private static $systemFiles = [
         // From safe-rm
         '/',
@@ -68,7 +70,7 @@ class Helper
             $args[] = self::activeDomain()->getHomePath();
         }
 
-        $size = 0;
+        $kiloBytes = 0;
 
         try {
             $result = \pm_ApiCli::callSbin('size.sh', $args, \pm_ApiCli::RESULT_EXCEPTION);
@@ -76,13 +78,15 @@ class Helper
             $pos = strpos($output, "\t");
 
             if ($pos !== false) {
-                $size = (int) substr($output, 0, $pos);
+                $kiloBytes = (int) substr($output, 0, $pos);
             }
         } catch (\pm_Exception $e) {
             // Exception intentionally silenced
         }
 
-        return $size;
+        $bytes = $kiloBytes * self::POWER;
+
+        return $bytes;
     }
 
     public static function delete(string $path): void

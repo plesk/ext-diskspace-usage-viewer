@@ -1,18 +1,19 @@
 // Copyright 1999-2019. Plesk International GmbH. All rights reserved.
 
 export const formatBytes = bytes => {
-    if (bytes === 0) {
-        return '0 kB';
-    }
-
+    const power = 1024;
     const units = ['kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+
+    if (bytes === 0) {
+        return `0 ${units[0]}`;
+    }
 
     let i = -1;
 
     do {
-        bytes = bytes / 1024;
+        bytes = bytes / power;
         i++;
-    } while (bytes > 1024);
+    } while (bytes > power);
 
     return `${Math.max(bytes, 0.1).toFixed(1)} ${units[i]}`;
 };
