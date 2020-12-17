@@ -1,3 +1,7 @@
+# 2.0.9 (17 Dec 2020)
+
+* [*] Tightened restrictions for deleting files inside Plesk system directories
+
 # 2.0.8 (19 Nov 2020)
 
 * [*] Calculate block size instead of apparent size (EXTCERT-3206)
