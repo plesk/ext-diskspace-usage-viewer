@@ -39,7 +39,8 @@ class Helper
 
         // Plesk-related
         '/opt/plesk',
-        '/opt/psa',
+        '/opt/psa/*',
+        '/usr/local/psa/*',
         '/var/www/vhosts/*/httpdocs',
         '/pleskswap',
         '/var/lib/psa/*',
