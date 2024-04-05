@@ -1,5 +1,5 @@
 <?php
-// Copyright 1999-2019. Plesk International GmbH. All rights reserved.
+// Copyright 1999-2024. WebPros International GmbH. All rights reserved.
 
 namespace PleskExt\DiskspaceUsageViewer;
 
@@ -114,11 +114,6 @@ class Helper
         $key = key($domains);
 
         return $domains[$key];
-    }
-
-    public static function canUserManageFiles(\pm_Domain $domain): bool
-    {
-        return \pm_Session::getClient()->hasCorePermission('filesManagement', $domain);
     }
 
     private static function isSystemFile(string $path): bool
