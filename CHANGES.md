@@ -1,3 +1,7 @@
+# 2.0.10 (05 April 2024)
+
+* [*] Internal improvements.
+
 # 2.0.9 (17 Dec 2020)
 
 * [*] Tightened restrictions for deleting files inside Plesk system directories

@@ -1,22 +1,28 @@
 <?php
-// Copyright 1999-2019. Plesk International GmbH. All rights reserved.
+// Copyright 1999-2024. WebPros International GmbH. All rights reserved.
 
 use PleskExt\DiskspaceUsageViewer\Cleaner;
 use PleskExt\DiskspaceUsageViewer\Controller;
 use PleskExt\DiskspaceUsageViewer\Files;
 use PleskExt\DiskspaceUsageViewer\Helper;
 use PleskExt\DiskspaceUsageViewer\Task\UpdateFiles as UpdateFilesTask;
+use PleskExt\DiskspaceUsageViewer\PermissionChecker;
 
 class IndexController extends Controller
 {
     public function indexAction()
     {
         $domainId = (int) $this->getParam('site_id');
-
+        $client = pm_Session::getClient();
         if ($domainId > 0) {
-            $url = pm_Context::getBaseUrl() . '#' . $this->dir();
-
+            $url = pm_Context::getBaseUrl() . '#' . $this->dir($client);
             $this->redirect($url);
+        } elseif (!$client->isAdmin()) {
+            $domain = Helper::activeDomain();
+            $permissionChecker = new PermissionChecker();
+            if (!$permissionChecker->canManageFiles($client, $domain)) {
+                throw new pm_Exception('Permission denied');
+            }
         }
 
         $openFiles = (bool) $this->getParam('openFiles', 0);
@@ -35,8 +41,9 @@ class IndexController extends Controller
 
     public function usageAction()
     {
-        $dir = $this->dir();
         $client = pm_Session::getClient();
+        $dir = $this->dir($client);
+
 
         if ($client->isAdmin()) {
             $fileManager = new pm_ServerFileManager();
@@ -105,8 +112,8 @@ class IndexController extends Controller
     public function updateFilesAction()
     {
         $this->requirePost();
-
-        $dir = $this->dir();
+        $client = pm_Session::getClient();
+        $dir = $this->dir($client);
         $task = new UpdateFilesTask();
         $url = pm_Context::getBaseUrl() . '?openFiles=1#' . $dir;
 
@@ -192,14 +199,14 @@ class IndexController extends Controller
         $this->ajax([]);
     }
 
-    private function dir(): string
+    private function dir(\pm_Client $client): string
     {
         $domainId = (int) $this->getParam('site_id');
-
+        $permissionChecker = new PermissionChecker();
         if ($domainId > 0) {
             $pmDomain = pm_Domain::getByDomainId($domainId);
 
-            if (!Helper::canUserManageFiles($pmDomain)) {
+            if (!$permissionChecker->canManageFiles($client, $pmDomain)) {
                 throw new pm_Exception('Permission denied');
             }
 
@@ -213,6 +220,10 @@ class IndexController extends Controller
         }
 
         $domain = Helper::activeDomain();
+        if (!$permissionChecker->canManageFiles($client, $domain)) {
+            throw new pm_Exception('Permission denied');
+        }
+
         $baseDir = $domain->getHomePath();
 
         if (substr($dir, 0, strlen($baseDir)) !== $baseDir) {

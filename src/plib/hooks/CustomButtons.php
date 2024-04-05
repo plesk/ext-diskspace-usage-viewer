@@ -1,7 +1,8 @@
 <?php
-// Copyright 1999-2019. Plesk International GmbH. All rights reserved.
+// Copyright 1999-2024. WebPros International GmbH. All rights reserved.
 
 use PleskExt\DiskspaceUsageViewer\Helper;
+use PleskExt\DiskspaceUsageViewer\PermissionChecker;
 
 class Modules_DiskspaceUsageViewer_CustomButtons extends pm_Hook_CustomButtons
 {
@@ -39,8 +40,7 @@ class Modules_DiskspaceUsageViewer_CustomButtons extends pm_Hook_CustomButtons
         }
 
         $domain = pm_Domain::getByDomainId($params['site_id']);
-
-        if (!Helper::canUserManageFiles($domain)) {
+        if (!(new PermissionChecker())->canManageFiles(\pm_Session::getClient(), $domain)) {
             return false;
         }
 
