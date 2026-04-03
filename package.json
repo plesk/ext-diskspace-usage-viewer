@@ -15,8 +15,8 @@
     "webpack-cli": "^4.2.0"
   },
   "scripts": {
-    "dev": "webpack --watch --mode development",
-    "build": "webpack",
+    "dev": "node --openssl-legacy-provider ./node_modules/webpack/bin/webpack.js --watch --mode development",
+    "build": "node --openssl-legacy-provider ./node_modules/webpack/bin/webpack.js",
     "lint": "eslint frontend"
   },
   "resolutions": {

@@ -1,3 +1,7 @@
+# 2.0.11 (04 May 2026)
+
+* [-] Fixed missing access checks for additional users in file size and delete operations (EXTPLESK-13593)
+
 # 2.0.10 (05 April 2024)
 
 * [*] Internal improvements.

@@ -1,5 +1,5 @@
 <?php
-// Copyright 1999-2024. WebPros International GmbH. All rights reserved.
+// Copyright 1999-2026. WebPros International GmbH. All rights reserved.
 
 use PleskExt\DiskspaceUsageViewer\Cleaner;
 use PleskExt\DiskspaceUsageViewer\Controller;
@@ -48,7 +48,7 @@ class IndexController extends Controller
         if ($client->isAdmin()) {
             $fileManager = new pm_ServerFileManager();
         } else {
-            $fileManager = new pm_FileManager(Helper::activeDomain()->getId());
+            $fileManager = new pm_FileManager(Helper::requireActiveDomain()->getId());
         }
 
         $items = [];
@@ -83,6 +83,7 @@ class IndexController extends Controller
 
     public function sizeAction()
     {
+        $this->requireProtectedActionAccess();
         $path = Helper::cleanPath($this->getParam('path', ''));
 
         $this->ajax([
@@ -92,11 +93,13 @@ class IndexController extends Controller
 
     public function batchSizeAction()
     {
+        $this->requireProtectedActionAccess();
         $json = $this->getParam('json');
         $data = json_decode($json, true);
 
         foreach ($data as $key => $value) {
-            $data[$key]['size'] = Helper::size($value['path']);
+            $data[$key]['path'] = Helper::cleanPath($value['path'] ?? '');
+            $data[$key]['size'] = Helper::size($data[$key]['path']);
         }
 
         $this->ajax($data);
@@ -126,6 +129,7 @@ class IndexController extends Controller
 
     public function deleteByPathAction()
     {
+        $this->requireProtectedActionAccess();
         $this->requirePost();
 
         $json = $this->getParam('json');
@@ -134,6 +138,7 @@ class IndexController extends Controller
 
         foreach ($paths as $path) {
             try {
+                $path = Helper::cleanPath((string) $path);
                 Helper::delete($path);
             } catch (Exception $e) {
                 pm_Log::err($e);
@@ -202,27 +207,22 @@ class IndexController extends Controller
     private function dir(\pm_Client $client): string
     {
         $domainId = (int) $this->getParam('site_id');
-        $permissionChecker = new PermissionChecker();
+
         if ($domainId > 0) {
             $pmDomain = pm_Domain::getByDomainId($domainId);
-
-            if (!$permissionChecker->canManageFiles($client, $pmDomain)) {
-                throw new pm_Exception('Permission denied');
-            }
+            $this->assertCanManageFiles($client, $pmDomain);
 
             return $pmDomain->getDocumentRoot();
         }
 
         $dir = Helper::cleanPath($this->getParam('dir', ''));
 
-        if (pm_Session::getClient()->isAdmin()) {
+        if ($client->isAdmin()) {
             return $dir;
         }
 
-        $domain = Helper::activeDomain();
-        if (!$permissionChecker->canManageFiles($client, $domain)) {
-            throw new pm_Exception('Permission denied');
-        }
+        $domain = Helper::requireActiveDomain();
+        $this->assertCanManageFiles($client, $domain);
 
         $baseDir = $domain->getHomePath();
 
@@ -237,5 +237,30 @@ class IndexController extends Controller
         }
 
         return $dir;
+    }
+
+    /**
+     * @throws pm_Exception
+     */
+    private function requireProtectedActionAccess(): void
+    {
+        $client = pm_Session::getClient();
+
+        if ($client->isAdmin()) {
+            return;
+        }
+
+        $domainId = (int) $this->getParam('site_id');
+        $domain = $domainId > 0 ? pm_Domain::getByDomainId($domainId) : Helper::activeDomain();
+        $this->assertCanManageFiles($client, $domain);
+    }
+
+    private function assertCanManageFiles(\pm_Client $client, ?\pm_Domain $domain): void
+    {
+        $permissionChecker = new PermissionChecker();
+
+        if (!$permissionChecker->canManageFiles($client, $domain)) {
+            throw new pm_Exception('Permission denied');
+        }
     }
 }
