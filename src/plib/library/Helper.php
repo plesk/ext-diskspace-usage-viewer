@@ -1,5 +1,5 @@
 <?php
-// Copyright 1999-2024. WebPros International GmbH. All rights reserved.
+// Copyright 1999-2026. WebPros International GmbH. All rights reserved.
 
 namespace PleskExt\DiskspaceUsageViewer;
 
@@ -67,8 +67,9 @@ class Helper
         $args = [$path];
 
         if (\pm_Session::getClient()->isClient()) {
-            $args[] = self::activeDomain()->getSysUserLogin();
-            $args[] = self::activeDomain()->getHomePath();
+            $domain = self::requireActiveDomain();
+            $args[] = $domain->getSysUserLogin();
+            $args[] = $domain->getHomePath();
         }
 
         $kiloBytes = 0;
@@ -105,7 +106,7 @@ class Helper
         }
     }
 
-    public static function activeDomain(): \pm_Domain
+    public static function activeDomain(): ?\pm_Domain
     {
         $domains = \pm_Session::getCurrentDomains();
 
@@ -113,7 +114,18 @@ class Helper
 
         $key = key($domains);
 
-        return $domains[$key];
+        return $domains[$key] ?? null;
+    }
+
+    public static function requireActiveDomain(): \pm_Domain
+    {
+        $domain = self::activeDomain();
+
+        if (!$domain) {
+            throw new \pm_Exception('Permission denied');
+        }
+
+        return $domain;
     }
 
     private static function isSystemFile(string $path): bool
@@ -133,6 +145,6 @@ class Helper
             return new \pm_ServerFileManager;
         }
 
-        return new \pm_FileManager(self::activeDomain()->getId());
+        return new \pm_FileManager(self::requireActiveDomain()->getId());
     }
 }

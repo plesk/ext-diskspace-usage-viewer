@@ -10,7 +10,7 @@ class PermissionChecker
      * @param \pm_Domain $domain
      * @return bool
      */
-    public function canManageFiles(\pm_Client $client, \pm_Domain $domain): bool
+    public function canManageFiles(\pm_Client $client, ?\pm_Domain $domain): bool
     {
         return $client->hasCorePermission('filesManagement', $domain);
     }
