@@ -1,4 +1,4 @@
-# 2.0.11 (04 May 2026)
+# 2.0.11 (18 May 2026)
 
 * [-] Fixed missing access checks for additional users in file size and delete operations (EXTPLESK-13593)
 
