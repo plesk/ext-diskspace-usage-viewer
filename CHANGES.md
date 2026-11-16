@@ -1,6 +1,6 @@
 # 2.0.12 (17 November 2026)
 
-* [!] Diskspace Usage Viewer version 2.0.12 is a "maintenance only" version of the extension for Plesk Onyx 17.8.11 to Plesk Obsidian 18.0.62. It will receive no further updates other than essential security fixes. Improvements and bugfixes will continue to be added only in the version of the extension for Plesk Obsidian 18.0.63 and later.
+* [!] Diskspace Usage Viewer version 2.0.12 is a "maintenance only" version of the extension for Plesk Onyx 17.8.11 to Plesk Obsidian 18.0.66. It will receive no further updates other than essential security fixes. Improvements and bugfixes will continue to be added only in the version of the extension for Plesk Obsidian 18.0.67 and later.
 
 # 2.0.11 (18 May 2026)
 
