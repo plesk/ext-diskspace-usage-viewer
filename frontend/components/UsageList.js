@@ -15,6 +15,8 @@ import {
 } from '@plesk/ui-library';
 
 import {
+    dirFromHash,
+    dirToHash,
     formatBytes,
     formatTimestamp,
     postParams,
@@ -121,9 +123,7 @@ class UsageList extends Component {
     }
 
     reRender = event => {
-        if (event.state) {
-            this.load(event.state.dir);
-        }
+        this.load(event.state ? event.state.dir : dirFromHash(window.location.hash));
     };
 
     updateBreadcrumbs = dir => {
@@ -265,7 +265,7 @@ class UsageList extends Component {
 
     load = (dir, changeState) => {
         if (changeState) {
-            history.pushState({ dir }, null, `#${dir}`);
+            history.pushState({ dir }, null, dirToHash(dir));
         }
 
         this.setState({

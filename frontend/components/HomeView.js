@@ -9,12 +9,13 @@ import {
     Translate,
 } from '@plesk/ui-library';
 
+import { dirFromHash } from '../utils';
 import FileList from './FileList';
 import UsageList from './UsageList';
 
 class HomeView extends Component {
     state = {
-        dir: window.location.hash ? window.location.hash.substr(1) : '/',
+        dir: dirFromHash(window.location.hash),
     };
 
     renderFilesTab = () => {

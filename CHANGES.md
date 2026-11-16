@@ -1,5 +1,6 @@
 # 2.0.12 (17 November 2026)
 
+* [-] After a page reload, directories whose names contain a space or "%" are now shown correctly (EXTPLESK-14723)
 * [-] Files and directories inside protected system directories (for example, /etc/passwd or /opt/psa) can no longer be deleted (EXTPLESK-14697)
 * [+] Security improvements.
 
