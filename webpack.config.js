@@ -1,13 +1,16 @@
-import path from 'path';
+const path = require('path');
 
-export default {
+module.exports = {
     mode: 'production',
     context: path.resolve(__dirname, 'frontend'),
     entry: './main',
     output: {
         filename: 'main.js',
         path: path.resolve(__dirname, 'src/htdocs/js'),
-        libraryTarget: 'amd',
+        library: {
+            type: 'amd',
+            export: 'default',
+        },
     },
     module: {
         rules: [
@@ -18,16 +21,21 @@ export default {
             },
             {
                 test: /\.(png|gif|svg|jpg|woff|woff2)$/i,
-                loader: 'file-loader',
-                options: {
-                    name: '[name].[ext]?[hash]',
+                type: 'asset/resource',
+                generator: {
+                    filename: '../images/[name][ext]?[hash]',
                     publicPath: 'images/',
-                    outputPath: '../images/',
                 },
             },
         ],
     },
+    resolve: {
+        alias: {
+            react$: path.resolve(__dirname, 'frontend/react-shim.js'),
+            'react-dom$': path.resolve(__dirname, 'frontend/react-shim.js'),
+        },
+    },
     externals: {
-        '@plesk/ui-library': {amd: 'plesk-ui-library'},
+        '@plesk/ui-library': { amd: 'plesk-ui-library' },
     },
 };

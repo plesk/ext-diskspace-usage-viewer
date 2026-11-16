@@ -23,16 +23,6 @@ class FileList extends Component {
     constructor(props) {
         super(props);
 
-        this.state = {
-            dir: this.props.dir,
-            items: [],
-            itemsLoading: true,
-            selection: [],
-            filesUpdating: false,
-            showDeleteDialog: false,
-            deletionInProgress: false,
-        };
-
         this.cols = [{
             key: 'name',
             title: <Translate content="tab.files.col.name" />,
@@ -70,6 +60,16 @@ class FileList extends Component {
 
         this.load();
     }
+
+    state = {
+        dir: this.props.dir,
+        items: [],
+        itemsLoading: true,
+        selection: [],
+        filesUpdating: false,
+        showDeleteDialog: false,
+        deletionInProgress: false,
+    };
 
     load = () => {
         this.setState({ itemsLoading: true });
