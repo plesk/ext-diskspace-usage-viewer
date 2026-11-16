@@ -10,10 +10,15 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "PleskExt\\DiskspaceUsageViewer\\": "src/plib/library/"
+      "PleskExt\\DiskspaceUsageViewer\\": "src/plib/library/",
+      "PleskExt\\DiskspaceUsageViewer\\Tests\\": "tests/"
     }
   },
   "require-dev": {
-    "plesk/pm-api-stubs": "^18.0"
+    "plesk/pm-api-stubs": "^18.0",
+    "phpunit/phpunit": "^9.6"
+  },
+  "scripts": {
+    "test": "phpunit"
   }
 }

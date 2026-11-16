@@ -7,14 +7,12 @@ class Helper
 {
     private const POWER = 1024;
 
-    private static $systemFiles = [
-        // From safe-rm
-        '/',
+    // Each directory and all of its contents are protected.
+    private const PROTECTED_TREES = [
         '/bin',
         '/boot',
         '/dev',
         '/etc',
-        '/home',
         '/initrd',
         '/lib',
         '/lib32',
@@ -24,26 +22,18 @@ class Helper
         '/sbin',
         '/sys',
         '/usr',
-        '/usr/bin',
-        '/usr/include',
-        '/usr/lib',
-        '/usr/local',
-        '/usr/local/bin',
-        '/usr/local/include',
-        '/usr/local/sbin',
-        '/usr/local/share',
-        '/usr/sbin',
-        '/usr/share',
-        '/usr/src',
-        '/var',
-
-        // Plesk-related
         '/opt/plesk',
-        '/opt/psa/*',
-        '/usr/local/psa/*',
+        '/opt/psa',
+        '/var/lib/psa',
+    ];
+
+    // Only the path itself is protected; its contents can be deleted.
+    private const PROTECTED_PATHS = [
+        '/',
+        '/home',
+        '/var',
         '/var/www/vhosts/*/httpdocs',
         '/pleskswap',
-        '/var/lib/psa/*',
     ];
 
     public static function cleanPath(string $path): string
@@ -93,6 +83,9 @@ class Helper
 
     public static function delete(string $path): void
     {
+        // The check and the delete must get the same path.
+        $path = self::cleanPath($path);
+
         if (self::isSystemFile($path)) {
             throw new \pm_Exception('Cannot delete system file: ' . $path);
         }
@@ -130,8 +123,40 @@ class Helper
 
     private static function isSystemFile(string $path): bool
     {
-        foreach (self::$systemFiles as $systemFile) {
-            if (fnmatch($systemFile, $path)) {
+        foreach (self::pathVariants($path) as $variant) {
+            if (self::isProtected($variant)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // The given path, and the same path with symbolic links in its parent directories resolved.
+    // The last element is not resolved: the file manager removes a link, not its target.
+    private static function pathVariants(string $path): array
+    {
+        $path = self::cleanPath($path);
+        $variants = [$path];
+
+        $resolvedParent = realpath(dirname($path));
+        if ($resolvedParent !== false) {
+            $variants[] = self::cleanPath($resolvedParent . '/' . basename($path));
+        }
+
+        return array_unique($variants);
+    }
+
+    private static function isProtected(string $path): bool
+    {
+        foreach (self::PROTECTED_TREES as $tree) {
+            if ($path === $tree || strpos($path, $tree . '/') === 0) {
+                return true;
+            }
+        }
+
+        foreach (self::PROTECTED_PATHS as $pattern) {
+            if (fnmatch($pattern, $path)) {
                 return true;
             }
         }

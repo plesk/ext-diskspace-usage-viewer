@@ -1,3 +1,7 @@
+# 2.0.12 (16 Nov 2026)
+
+* [-] Files and directories inside protected system directories (for example, /etc/passwd or /opt/psa) can no longer be deleted (EXTPLESK-14697)
+
 # 2.0.11 (18 May 2026)
 
 * [-] Fixed missing access checks for additional users in file size and delete operations (EXTPLESK-13593)
