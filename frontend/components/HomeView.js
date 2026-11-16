@@ -13,19 +13,9 @@ import FileList from './FileList';
 import UsageList from './UsageList';
 
 class HomeView extends Component {
-    constructor(props) {
-        super(props);
-
-        let dir = '/';
-
-        if (window.location.hash) {
-            dir = window.location.hash.substr(1);
-        }
-
-        this.state = {
-            dir,
-        };
-    }
+    state = {
+        dir: window.location.hash ? window.location.hash.substr(1) : '/',
+    };
 
     renderFilesTab = () => {
         if (!this.props.isAdmin) {

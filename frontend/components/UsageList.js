@@ -36,20 +36,6 @@ class UsageList extends Component {
     constructor(props) {
         super(props);
 
-        this.state = {
-            dir: this.props.dir,
-            items: [],
-            itemsLoading: true,
-            breadcrumbs: [],
-            selection: [],
-            showDeleteDialog: false,
-            deletionInProgress: false,
-            showCleanupDialog: false,
-            cleanupInProgress: false,
-            chartData: [],
-            sizesLoaded: 0,
-        };
-
         this.cols = [{
             key: 'name',
             title: <Translate content="tab.usage.col.name" />,
@@ -115,6 +101,20 @@ class UsageList extends Component {
 
         this.reload();
     }
+
+    state = {
+        dir: this.props.dir,
+        items: [],
+        itemsLoading: true,
+        breadcrumbs: [],
+        selection: [],
+        showDeleteDialog: false,
+        deletionInProgress: false,
+        showCleanupDialog: false,
+        cleanupInProgress: false,
+        chartData: [],
+        sizesLoaded: 0,
+    };
 
     componentDidMount() {
         window.addEventListener('popstate', this.reRender, false);

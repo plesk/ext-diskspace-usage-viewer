@@ -1,6 +1,7 @@
-# 2.0.12 (16 Nov 2026)
+# 2.0.12 (17 November 2026)
 
 * [-] Files and directories inside protected system directories (for example, /etc/passwd or /opt/psa) can no longer be deleted (EXTPLESK-14697)
+* [+] Security improvements.
 
 # 2.0.11 (18 May 2026)
 
@@ -10,27 +11,27 @@
 
 * [*] Internal improvements.
 
-# 2.0.9 (17 Dec 2020)
+# 2.0.9 (17 December 2020)
 
 * [*] Tightened restrictions for deleting files inside Plesk system directories
 
-# 2.0.8 (19 Nov 2020)
+# 2.0.8 (19 November 2020)
 
 * [*] Calculate block size instead of apparent size (EXTCERT-3206)
 
-# 2.0.7 (3 Feb 2020)
+# 2.0.7 (3 February 2020)
 
 * [*] Limit access to extension for users that do not have the "Upload and manage files" user role
 
-# 2.0.6 (5 Dec 2019)
+# 2.0.6 (5 December 2019)
 
 * [+] Added "Last modified" column in Diskspace Usage tab
 
-# 2.0.5 (25 Nov 2019)
+# 2.0.5 (25 November 2019)
 
 * [*] Improved list building performance of largest files
 
-# 2.0.4 (13 Aug 2019)
+# 2.0.4 (13 August 2019)
 
 * [+] Added "Last modified" column in Largest Files list
 

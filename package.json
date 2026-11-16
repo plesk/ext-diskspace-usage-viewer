@@ -1,25 +1,25 @@
 {
   "name": "diskspace-usage-viewer",
   "version": "2.0.9",
+  "engines": {
+    "node": "^22.18.0 || >=24.11.0"
+  },
   "devDependencies": {
-    "axios": "^0.21.0",
-    "babel-core": "^6.26.3",
-    "babel-loader": "7",
-    "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "babel-plugin-transform-react-jsx": "^6.24.1",
-    "babel-preset-env": "^1.7.0",
-    "create-plesk-app": "^1.0.6",
+    "@babel/core": "^8.1.2",
+    "@babel/preset-env": "^8.0.7",
+    "@babel/preset-react": "^8.0.1",
+    "@plesk/eslint-config": "^4.1.0",
+    "axios": "^1.21.1",
+    "babel-loader": "^10.1.1",
+    "eslint": "^9.39.5",
     "react-loading-bar": "^0.0.7",
-    "recharts": "^1.8.5",
-    "webpack": "^5.5.1",
-    "webpack-cli": "^4.2.0"
+    "recharts": "^2.15.4",
+    "webpack": "^5.112.2",
+    "webpack-cli": "^5.1.4"
   },
   "scripts": {
-    "dev": "node --openssl-legacy-provider ./node_modules/webpack/bin/webpack.js --watch --mode development",
-    "build": "node --openssl-legacy-provider ./node_modules/webpack/bin/webpack.js",
+    "dev": "webpack --watch --mode development",
+    "build": "webpack",
     "lint": "eslint frontend"
-  },
-  "resolutions": {
-    "terser": "3.14.1"
   }
 }

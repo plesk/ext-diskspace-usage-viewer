@@ -7,7 +7,7 @@ import {
 
 import App from './components/App';
 
-module.exports = (container, props) => {
+export default (container, props) => {
     render(
         <App {...props} />,
         container,
