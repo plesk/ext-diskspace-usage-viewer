@@ -9,3 +9,12 @@ Icons by [WebDesignerDepot](https://www.webdesignerdepot.com).
 ## Requirements
 
 * Plesk Onyx 17.8.11 or later
+
+## Tests
+
+Install the development dependencies and run the unit tests:
+
+```bash
+composer install
+composer test
+```
