@@ -33,6 +33,29 @@ class DirectoryListingTest extends TestCase
         $this->assertSame([true, false, false, false, true], array_column($items, 'isDir'));
     }
 
+    /**
+     * @dataProvider directoryProvider
+     */
+    public function testItemsJoinTheDirectoryAndTheName(string $dir, string $name, string $expectedPath): void
+    {
+        $fileManager = $this->createMock(\pm_FileManager::class);
+        $fileManager->method('scanDir')->willReturn([$name]);
+        $fileManager->method('isDir')->willReturn(true);
+
+        $items = DirectoryListing::items($fileManager, $dir);
+
+        $this->assertSame([$expectedPath], array_column($items, 'path'));
+    }
+
+    public function directoryProvider(): array
+    {
+        return [
+            'root directory' => ['/', 'lost+found', '/lost+found'],
+            'trailing slash' => ['/srv/', 'a+b', '/srv/a+b'],
+            'no trailing slash' => ['/srv', 'a+b', '/srv/a+b'],
+        ];
+    }
+
     public function testItemsSkipNamesThatTheFileManagerCannotCheck(): void
     {
         $fileManager = $this->createMock(\pm_FileManager::class);

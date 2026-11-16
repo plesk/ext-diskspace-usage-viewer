@@ -11,7 +11,7 @@ class DirectoryListing
         $items = [];
 
         foreach ($fileManager->scanDir($dir, true) as $basename) {
-            $path = Helper::childPath($dir, $basename);
+            $path = self::childPath($dir, $basename);
 
             try {
                 $isDir = $fileManager->isDir($path);
@@ -35,5 +35,10 @@ class DirectoryListing
         }
 
         return $items;
+    }
+
+    private static function childPath(string $dir, string $name): string
+    {
+        return rtrim($dir, '/') . '/' . $name;
     }
 }
