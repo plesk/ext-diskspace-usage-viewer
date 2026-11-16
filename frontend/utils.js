@@ -46,3 +46,23 @@ export const postParams = params => {
 };
 
 export const urlTo = (controller, action) => `/modules/diskspace-usage-viewer/index.php/${controller}/${action}`;
+
+export const dirToHash = dir => {
+    const segments = dir.split('/').map(encodeURIComponent);
+
+    return `#${segments.join('/')}`;
+};
+
+export const dirFromHash = hash => {
+    const value = hash.replace(/^#/, '');
+
+    if (value === '') {
+        return '/';
+    }
+
+    try {
+        return decodeURIComponent(value);
+    } catch {
+        return value;
+    }
+};
