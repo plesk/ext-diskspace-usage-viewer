@@ -3,6 +3,7 @@
 
 use PleskExt\DiskspaceUsageViewer\Cleaner;
 use PleskExt\DiskspaceUsageViewer\Controller;
+use PleskExt\DiskspaceUsageViewer\DirectoryListing;
 use PleskExt\DiskspaceUsageViewer\Files;
 use PleskExt\DiskspaceUsageViewer\Helper;
 use PleskExt\DiskspaceUsageViewer\Task\UpdateFiles as UpdateFilesTask;
@@ -44,39 +45,13 @@ class IndexController extends Controller
         $client = pm_Session::getClient();
         $dir = $this->dir($client);
 
-
         if ($client->isAdmin()) {
             $fileManager = new pm_ServerFileManager();
         } else {
             $fileManager = new pm_FileManager(Helper::requireActiveDomain()->getId());
         }
 
-        $items = [];
-
-        foreach ($fileManager->scanDir($dir, true) as $basename) {
-            $basename = urldecode($basename);
-            $path = rtrim($dir, '/') . '/' . $basename;
-
-            try {
-                $isDir = $fileManager->isDir($path);
-                $mtime = @filemtime($path);
-
-                if ($mtime === false) {
-                    $mtime = 0;
-                }
-            } catch (PleskUtilException $e) {
-                continue;
-            }
-
-            $items[] = [
-                'name' => $basename,
-                'isDir' => $isDir,
-                'path' => $path,
-                'mtime' => $mtime,
-                'size' => 0,
-                'sizeLoading' => true,
-            ];
-        }
+        $items = DirectoryListing::items($fileManager, $dir);
 
         $this->ajax($items);
     }
