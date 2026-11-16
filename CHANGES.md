@@ -2,7 +2,7 @@
 
 * [-] Files and directories inside protected system directories (for example, /etc/passwd or /opt/psa) can no longer be deleted (EXTPLESK-14697)
 * [-] File names that contain "+" are now shown and deleted correctly (EXTPLESK-14721)
-* [*] The minimum supported Plesk version is now 18.0.63 (EXTPLESK-14721)
+* [*] The minimum supported Plesk version is now 18.0.67 (EXTPLESK-14721)
 * [+] Security improvements.
 
 # 2.0.11 (18 May 2026)

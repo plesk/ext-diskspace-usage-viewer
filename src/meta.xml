@@ -9,7 +9,7 @@
   <release>{{RELEASE}}</release>
   <vendor>Plesk</vendor>
   <url>https://www.plesk.com</url>
-  <plesk_min_version>18.0.63</plesk_min_version>
+  <plesk_min_version>18.0.67</plesk_min_version>
   <os>unix</os>
   <!--Localized descriptions below-->
   <description xml:lang="ar">ابحث عن المجلدات ذات المساحة القرصية الأكثر استخدامًا وفرِّغ بعض المساحة بسهولة.</description>

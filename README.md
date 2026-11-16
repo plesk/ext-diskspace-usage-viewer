@@ -8,7 +8,7 @@ Icons by [WebDesignerDepot](https://www.webdesignerdepot.com).
 
 ## Requirements
 
-- Plesk Obsidian 18.0.63 or later
+* Plesk Obsidian 18.0.67 or later
 
 ## Tests
 
