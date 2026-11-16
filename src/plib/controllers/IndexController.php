@@ -54,8 +54,7 @@ class IndexController extends Controller
         $items = [];
 
         foreach ($fileManager->scanDir($dir, true) as $basename) {
-            $basename = urldecode($basename);
-            $path = rtrim($dir, '/') . '/' . $basename;
+            $path = Helper::childPath($dir, $basename);
 
             try {
                 $isDir = $fileManager->isDir($path);

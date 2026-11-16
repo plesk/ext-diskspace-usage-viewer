@@ -60,6 +60,25 @@ class HelperTest extends TestCase
     }
 
     /**
+     * @dataProvider childPathProvider
+     */
+    public function testChildPath(string $dir, string $name, string $expected): void
+    {
+        $this->assertSame($expected, Helper::childPath($dir, $name));
+    }
+
+    public function childPathProvider(): array
+    {
+        return [
+            'plus sign in root' => ['/', 'lost+found', '/lost+found'],
+            'plus sign in file name' => ['/var/www/vhosts/example.com/httpdocs', 'a+b.txt', '/var/www/vhosts/example.com/httpdocs/a+b.txt'],
+            'percent sequence in file name' => ['/var/www', 'c%20d.txt', '/var/www/c%20d.txt'],
+            'space in file name' => ['/var/www', 'e f.txt', '/var/www/e f.txt'],
+            'trailing slash in directory' => ['/var/www/', 'a+b', '/var/www/a+b'],
+        ];
+    }
+
+    /**
      * @dataProvider protectedPathProvider
      */
     public function testProtectedPathIsSystemFile(string $path): void

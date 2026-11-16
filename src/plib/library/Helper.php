@@ -52,6 +52,12 @@ class Helper
         return '/' . implode('/', $segments);
     }
 
+    // The name is used as it is: the file manager gives raw names, and "+" or "%" can be part of a name.
+    public static function childPath(string $dir, string $name): string
+    {
+        return rtrim($dir, '/') . '/' . $name;
+    }
+
     public static function size(string $path): int
     {
         $args = [$path];
